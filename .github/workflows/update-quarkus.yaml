@@ -73,14 +73,6 @@ jobs:
         if: env.UPGRADE
         run: rm -r -f base/
 
-      - name: Get a tree listing of directory contents
-        if: env.UPGRADE
-        run: tree .
-
-      - name: List environment variables
-        if: env.UPGRADE
-        run: env
-
       - name: Set author information
         if: env.UPGRADE
         run: |
@@ -124,3 +116,11 @@ jobs:
             - [ ] Automated checks performed
             - [ ] Manual QA performed
         run: gh pr comment --body "$GIT_MSG"
+
+      - name: Get a tree listing of directory contents
+        if: env.UPGRADE
+        run: tree .
+
+      - name: List environment variables
+        if: env.UPGRADE
+        run: env
