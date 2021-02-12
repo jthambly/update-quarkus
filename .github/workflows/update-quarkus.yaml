@@ -6,7 +6,7 @@ on:
     - cron: '0 0 * * 0'
   workflow_dispatch:
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
     steps:
 
@@ -20,12 +20,18 @@ jobs:
         id: job-details
         run: |
           echo "QUARKUS_VERSION=$(gh release list --repo quarkusio/quarkus | grep ".Final" | awk '{print $1}' | sort -V | tail -1 )" >> $GITHUB_ENV
-          echo "CURRENT_VERSION=$(mvn help:evaluate -Dexpression=quarkus.platform.version -q -DforceStdout)" >> $GITHUB_ENV
-          echo "PROJECT_GROUP=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)" >> $GITHUB_ENV
-          echo "PROJECT_NAME=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> $GITHUB_ENV
-
-      - name: Determine if there is an upgrade available
-        if: env.CURRENT_VERSION != env.QUARKUS_VERSION
+          
+      - name: Gather Existing POM information
+        id: quarkus-pom
+        uses: jthambly/quarkus-pom-action@v1
+        
+      - name: Check for existing branches
+        run: echo "BRANCHES_EXISTS=$(git ls-remote | grep q$QUARKUS_VERSION | wc -l)" >> $GITHUB_ENV
+          
+      - name: Determine if there is an upgrade available and it has not commenced
+        if: env.CURRENT_VERSION != env.QUARKUS_VERSION && env.BRANCHES_EXISTS == 0
+        env:
+          CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
         run: |
           echo "UPGRADE=true" >> $GITHUB_ENV
           
@@ -36,22 +42,21 @@ jobs:
       - name: Generate latest base build
         if: env.UPGRADE
         env:
-          QUARKUS_EXTENSIONS: |
-            io.quarkus:quarkus-arc
-            io.rest-assured:rest-assured
-            io.quarkus:quarkus-junit5
-            io.quarkus:quarkus-resteasy
+          CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
+          PROJECT_GROUP: ${{ steps.quarkus-pom.outputs.project_group }}
+          PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
+          QUARKUS_EXTENSIONS: ${{ steps.quarkus-pom.outputs.quarkus_extensions }}
         run: |
           mkdir base
           cd base
           mvn "io.quarkus:quarkus-maven-plugin:$QUARKUS_VERSION:create" \
             -DprojectGroupId="$PROJECT_GROUP" \
             -DprojectArtifactId="$PROJECT_NAME" \
-            -Dextensions="$(echo $QUARKUS_EXTENSIONS | tr '\n' ',' | sed s'/,$//' )"
-
+            -Dextensions="$QUARKUS_EXTENSIONS"
       - name: Update file structure
         if: env.UPGRADE
         env:
+          PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
           PROJECT_FILES: |
             .git/
             .github/
@@ -68,20 +73,11 @@ jobs:
         if: env.UPGRADE
         run: rm -r -f base/
 
-#       - name: Get a tree listing of directory contents
-#         if: env.UPGRADE
-#         run: tree .
-
-#       - name: List environment variables
-#         if: env.UPGRADE
-#         run: env
-
       - name: Set author information
         if: env.UPGRADE
         run: |
           git config --global user.email "noreply@github.com"
           git config --global user.name "automated"
-
       - name: Commit changes
         if: env.UPGRADE
         run: git commit -am "Automated - Updated to Quarkus version $QUARKUS_VERSION"
@@ -100,14 +96,12 @@ jobs:
           echo "[Release Information - $QUARKUS_VERSION](https://github.com/quarkusio/quarkus/releases/tag/$QUARKUS_VERSION)" >> $GITHUB_ENV
           echo "[Migration Guide - $QUARKUS_VERSION](https://github.com/quarkusio/quarkus/wiki/Migration-Guide-$QUARKUS_VERSION_MAJOR_MINOR)" >> $GITHUB_ENV
           echo "EOE" >> $GITHUB_ENV
-
       - name: Create a pull request
         if: env.UPGRADE
         run: |
           gh pr create --title "Automated - Updated to Quarkus version $QUARKUS_VERSION" \
             --body "$GIT_MSG" \
             --assignee "$GITHUB_REPOSITORY_OWNER"
-
       - name: Add migration checklist
         if: env.UPGRADE
         env:
@@ -122,3 +116,11 @@ jobs:
             - [ ] Automated checks performed
             - [ ] Manual QA performed
         run: gh pr comment --body "$GIT_MSG"
+
+      - name: Get a tree listing of directory contents
+        if: env.UPGRADE
+        run: tree .
+
+      - name: List environment variables
+        if: env.UPGRADE
+        run: env
