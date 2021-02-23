@@ -5,6 +5,7 @@ on:
   schedule:
     - cron: '0 0 * * 0'
   workflow_dispatch:
+  
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -12,49 +13,116 @@ jobs:
 
       - name: Check out repository
         uses: actions/checkout@v2
+        with:
+          path: working-copy
         
-      - name: Authenticate GutHub CLI
+      - name: Authenticate GitHub CLI
         run: echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
 
-      - name: Set environment variables
-        id: job-details
-        run: |
-          echo "QUARKUS_VERSION=$(gh release list --repo quarkusio/quarkus | grep ".Final" | awk '{print $1}' | sort -V | tail -1 )" >> $GITHUB_ENV
+      - name: Obtain Quarkus release information
+        run: echo "QUARKUS_VERSION=$(gh release list --repo quarkusio/quarkus | grep ".Final" | awk '{print $1}' | sort -V | tail -1 )" >> $GITHUB_ENV
           
       - name: Gather Existing POM information
         id: quarkus-pom
         uses: jthambly/quarkus-pom-action@v1
+        with:
+          filename: working-copy/pom.xml
         
       - name: Check for existing branches
         run: echo "BRANCHES_EXISTS=$(git ls-remote | grep q$QUARKUS_VERSION | wc -l)" >> $GITHUB_ENV
           
       - name: Determine if there is an upgrade available and it has not commenced
-        if: env.CURRENT_VERSION != env.QUARKUS_VERSION && env.BRANCHES_EXISTS == 0
+        if: ${{ env.CURRENT_VERSION != env.QUARKUS_VERSION && env.BRANCHES_EXISTS == 0 }}
         env:
           CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
         run: |
           echo "UPGRADE=true" >> $GITHUB_ENV
           
       - name: Create new branch for updated version
-        if: env.UPGRADE
-        run: git switch -c "q$QUARKUS_VERSION"
-
-      - name: Generate latest base build
-        if: env.UPGRADE
+        if: ${{ env.UPGRADE }}
+        run: |
+          cd working-copy
+          git switch -c "q$QUARKUS_VERSION"
+          
+      - name: Check if current base checksum exists
+        if: ${{ env.UPGRADE }}
+        env:
+          CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
+        run: echo "CHK_SUM_EXISTS=$(test -e working-copy/.update/$CURRENT_VERSION.sha256; echo $?)" >> $GITHUB_ENV   
+          
+      - name: Generate current base build
+        if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS != 0  }}
+        continue-on-error: true
         env:
           CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
           PROJECT_GROUP: ${{ steps.quarkus-pom.outputs.project_group }}
           PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
           QUARKUS_EXTENSIONS: ${{ steps.quarkus-pom.outputs.quarkus_extensions }}
         run: |
-          mkdir base
-          cd base
+          mkdir -p old
+          cd old
+          mvn "io.quarkus:quarkus-maven-plugin:$CURRENT_VERSION:create" \
+            -DprojectGroupId="$PROJECT_GROUP" \
+            -DprojectArtifactId="$PROJECT_NAME" \
+            -Dextensions="$QUARKUS_EXTENSIONS"
+             
+      - name: Generate checksums of current base build
+        if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS != 0 }}
+        continue-on-error: true
+        env:
+          CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
+          PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
+        run: |
+          mkdir -p working-copy/.update && \
+          cd "old/$PROJECT_NAME" && \
+          find . -type f | xargs sha256sum > "../../working-copy/.update/$CURRENT_VERSION.sha256" && \
+          echo "CHK_SUM_EXISTS=0" >> $GITHUB_ENV
+
+      - name: Generate latest base build
+        if: ${{ env.UPGRADE }}
+        env:
+          CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
+          PROJECT_GROUP: ${{ steps.quarkus-pom.outputs.project_group }}
+          PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
+          QUARKUS_EXTENSIONS: ${{ steps.quarkus-pom.outputs.quarkus_extensions }}
+        run: |
+          mkdir -p new
+          cd new
           mvn "io.quarkus:quarkus-maven-plugin:$QUARKUS_VERSION:create" \
             -DprojectGroupId="$PROJECT_GROUP" \
             -DprojectArtifactId="$PROJECT_NAME" \
             -Dextensions="$QUARKUS_EXTENSIONS"
-      - name: Update file structure
-        if: env.UPGRADE
+             
+      - name: Generate checksums of latest base build
+        if: ${{ env.UPGRADE }}
+        env:
+          PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
+        run: |
+          mkdir -p working-copy/.update
+          cd "new/$PROJECT_NAME"
+          find . -type f | xargs sha256sum > "../../working-copy/.update/$QUARKUS_VERSION.sha256"
+          
+      - name: Remove older Quarkus files based on matching checksums
+        if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS }}
+        env:
+          CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
+        run: |
+          cd working-copy
+          rm -f pom.xml $(sha256sum -c ".update/$CURRENT_VERSION.sha256" 2> /dev/null | grep ': OK' | sed 's/: OK$//' | tr '\n' ' ')
+          find . -type d -empty -delete
+          
+      - name: Diagnostics - Directory listing after removing files
+        if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS }}
+        run: tree -a working-copy
+          
+      - name: Update file structure using Copy
+        if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS }}
+        env:
+          PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
+        run: cp -anv "new/$PROJECT_NAME/." "working-copy/"
+
+      - name: Update file structure using Rsync
+        if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS != 0 }}
         env:
           PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
           PROJECT_FILES: |
@@ -66,28 +134,31 @@ jobs:
             yaml/
             base/
             LICENCE
-            #README
-        run: echo "$PROJECT_FILES" | rsync -av --delete --exclude-from=- "base/$PROJECT_NAME/" "./"
-
-      - name: Clean up base directory
-        if: env.UPGRADE
-        run: rm -r -f base/
+            README
+        run: echo "$PROJECT_FILES" | rsync -av --delete --exclude-from=- "new/$PROJECT_NAME/" "working-copy/"
 
       - name: Set author information
-        if: env.UPGRADE
+        if: ${{ env.UPGRADE }}
         run: |
+          cd working-copy
           git config --global user.email "noreply@github.com"
           git config --global user.name "automated"
+
       - name: Commit changes
-        if: env.UPGRADE
-        run: git commit -am "Automated - Updated to Quarkus version $QUARKUS_VERSION"
+        if: ${{ env.UPGRADE }}
+        run: |
+          cd working-copy
+          git add -A
+          git commit -m "Automated - Updated to Quarkus version $QUARKUS_VERSION"
 
       - name: Push upstream
-        if: env.UPGRADE
-        run: git push -u origin "q$QUARKUS_VERSION"
+        if: ${{ env.UPGRADE }}
+        run: |
+          cd working-copy
+          git push -u origin "q$QUARKUS_VERSION"
         
       - name: Generate documentation links
-        if: env.UPGRADE
+        if: ${{ env.UPGRADE }}
         run: |
           QUARKUS_VERSION_MAJOR_MINOR=$( echo $QUARKUS_VERSION | awk -F'.' '{print $1"."$2}' )
           echo "GIT_MSG<<EOE" >> $GITHUB_ENV
@@ -96,14 +167,17 @@ jobs:
           echo "[Release Information - $QUARKUS_VERSION](https://github.com/quarkusio/quarkus/releases/tag/$QUARKUS_VERSION)" >> $GITHUB_ENV
           echo "[Migration Guide - $QUARKUS_VERSION](https://github.com/quarkusio/quarkus/wiki/Migration-Guide-$QUARKUS_VERSION_MAJOR_MINOR)" >> $GITHUB_ENV
           echo "EOE" >> $GITHUB_ENV
+
       - name: Create a pull request
-        if: env.UPGRADE
+        if: ${{ env.UPGRADE }}
         run: |
+          cd working-copy
           gh pr create --title "Automated - Updated to Quarkus version $QUARKUS_VERSION" \
             --body "$GIT_MSG" \
             --assignee "$GITHUB_REPOSITORY_OWNER"
+
       - name: Add migration checklist
-        if: env.UPGRADE
+        if: ${{ env.UPGRADE }}
         env:
           GIT_MSG: |
             Migration Checklist:
@@ -111,16 +185,20 @@ jobs:
             - [x] Reviewers and Assignees assigned
             - [x] Link to Migration Documentation provided
             - [ ] Migration Documentation reviewed
-            - [ ] Migration changes reviewed
+            - [ ] Changes reviewed against existing project
             - [ ] File modifications reviewed
             - [ ] Automated checks performed
             - [ ] Manual QA performed
-        run: gh pr comment --body "$GIT_MSG"
+        run: |
+          cd working-copy
+          gh pr comment --body "$GIT_MSG"
 
-      - name: Get a tree listing of directory contents
-        if: env.UPGRADE
-        run: tree .
+      - name: Diagnostics - Git working status
+        if: ${{ env.UPGRADE }}
+        run: git status
+        
+      - name: Diagnostics - Get a tree listing of directory contents
+        run: tree -a .
 
-      - name: List environment variables
-        if: env.UPGRADE
+      - name: Diagnostics - List environment variables
         run: env
