@@ -195,7 +195,9 @@ jobs:
 
       - name: Diagnostics - Git working status
         if: ${{ env.UPGRADE }}
-        run: git status
+        run: |
+          cd working-copy
+          git status
         
       - name: Diagnostics - Get a tree listing of directory contents
         run: tree -a .
