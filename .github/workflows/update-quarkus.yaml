@@ -163,7 +163,7 @@ jobs:
         run: |
           cd working-copy
           git add -A
-          git commit -m "Automated - Updated to Quarkus version $QUARKUS_VERSION"
+          git commit -m "Bump quarkus to $QUARKUS_VERSION"
 
       - name: Push upstream
         if: ${{ env.UPGRADE }}
