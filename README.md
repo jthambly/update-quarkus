@@ -22,16 +22,16 @@ Once commenced:
 
 There are two areas within the action file you may want to review and if necessary, configure.
 
-[**PROJECT_FILES**](.github/workflows/update-quarkus.yaml#L128)
+[**PROJECT_FILES**](.github/workflows/update-quarkus.yaml#L142)
 
 To determine which files are associated with Quarkus (as opposed to your files), the update process will generate a blank project using your current Quarkus version. Using this information, it will know which unmodified files to delete.
 
 If for some reason, it cannot generate a blank project (perhaps if a version is blocked for security reasons etc..) it will resort to a secondary method.
-In this case, it will update files with newer ones and may remove any files **not protected/listed** underneath the [PROJECT_FILES](.github/workflows/update-quarkus.yaml#L128) section.
+In this case, it will update files with newer ones and may remove any files **not protected/listed** underneath the [PROJECT_FILES](.github/workflows/update-quarkus.yaml#L142) section.
 
 *It is intended that this need will be removed in a later release, and the update process will attempt a best-effort approach.*
 
-[**GIT_MSG - Migration Checklist**](.github/workflows/update-quarkus.yaml#L183)
+[**GIT_MSG - Migration Checklist**](.github/workflows/update-quarkus.yaml#L196)
 
 Upon the creation of a pull request, a checklist will be added as a comment. 
 A basic checklist has already been provided, but you may wish to update it for your requirements.
