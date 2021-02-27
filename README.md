@@ -1,59 +1,41 @@
-# update-quarkus project
+# update-quarkus
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This project provides the GitHub Action workflows to update project files to use a newer version of [Quarkus](https://quarkus.io/).
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+## How to use
 
-## Running the application in dev mode
+Copy the [action file](.github/workflows/update-quarkus.yaml) to your projects `.github/workflows/` folder.
 
-You can run your application in dev mode that enables live coding using:
-```shell script
-./mvnw compile quarkus:dev
-```
+The action will run automatically once a week or can be [manually run](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow).
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+Once commenced:
 
-## Packaging and running the application
+ - It will look to see if there is a newer Quarkus version available. 
+ - If so:
+   - it will create a new branch, 
+   - update and commit the new project files, 
+   - create a pull request for your review,
+   - include links to Quarkus documentation, and
+   - include a migration checklist.
 
-The application can be packaged using:
-```shell script
-./mvnw package
-```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+## Customization
 
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
-```
+There are two areas within the action file you may want to review and if necessary, configure.
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+[**PROJECT_FILES**](.github/workflows/update-quarkus.yaml#L142)
 
-## Creating a native executable
+To determine which files are associated with Quarkus (as opposed to your files), the update process will generate a blank project using your current Quarkus version. Using this information, it will know which unmodified files to delete.
 
-You can create a native executable using: 
-```shell script
-./mvnw package -Pnative
-```
+If for some reason, it cannot generate a blank project (perhaps if a version is blocked for security reasons etc..) it will resort to a secondary method.
+In this case, it will update files with newer ones and may remove any files **not protected/listed** underneath the [PROJECT_FILES](.github/workflows/update-quarkus.yaml#L142) section.
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
-```
+*It is intended that this need will be removed in a later release, and the update process will attempt a best-effort approach.*
 
-You can then execute your native executable with: `./target/update-quarkus-1.0.0-SNAPSHOT-runner`
+[**GIT_MSG - Migration Checklist**](.github/workflows/update-quarkus.yaml#L196)
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
+Upon the creation of a pull request, a checklist will be added as a comment. 
+A basic checklist has already been provided, but you may wish to update it for your requirements.
 
-## Related guides
+## Future direction
 
-- RESTEasy JAX-RS ([guide](https://quarkus.io/guides/rest-json)): REST endpoint framework implementing JAX-RS and more
-- ArC ([guide](https://quarkus.io/guides/cdi-reference)): Build time CDI dependency injection
-
-## Provided examples
-
-### RESTEasy JAX-RS example
-
-REST is easy peasy with this Hello World RESTEasy resource.
-
-[Related guide section...](https://quarkus.io/guides/getting-started#the-jax-rs-resources)
+It is intended that this will be created as a custom GitHub Action to make it simpler and cleaner for anyone wishing to use it.
