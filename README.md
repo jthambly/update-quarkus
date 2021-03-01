@@ -1,3 +1,5 @@
+[![Verify GitHub Action](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml/badge.svg?branch=master)](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml)
+
 # update-quarkus
 
 This project provides the GitHub Action workflows to update project files to use a newer version of [Quarkus](https://quarkus.io/).
