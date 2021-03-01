@@ -33,6 +33,9 @@ jobs:
       - name: Authenticate GitHub CLI
         run: echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
 
+      - name: Set friendly branch name
+        run: echo "BRANCH_NAME=$(echo $GITHUB_REF | sed s'/^.*\///')" >> $GITHUB_ENV
+
       - name: Obtain Quarkus release information
         run: echo "QUARKUS_VERSION=$(gh release list --repo quarkusio/quarkus | grep ".Final" | awk '{print $1}' | sort -V | tail -1 )" >> $GITHUB_ENV
           
@@ -43,10 +46,10 @@ jobs:
           filename: working-copy/pom.xml
         
       - name: Check for existing branches
-        run: echo "BRANCHES_EXISTS=$(git ls-remote | grep q$QUARKUS_VERSION | wc -l)" >> $GITHUB_ENV
+        run: echo "NUM_BRANCHES_EXISTS=$(git ls-remote | grep $BRANCH_NAME-to-q$QUARKUS_VERSION | wc -l)" >> $GITHUB_ENV
           
       - name: Determine if there is an upgrade available and it has not commenced
-        if: ${{ env.CURRENT_VERSION != env.QUARKUS_VERSION && env.BRANCHES_EXISTS == 0 }}
+        if: ${{ env.CURRENT_VERSION != env.QUARKUS_VERSION && env.NUM_BRANCHES_EXISTS == 0 }}
         env:
           CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
         run: |
@@ -56,7 +59,7 @@ jobs:
         if: ${{ env.UPGRADE }}
         run: |
           cd working-copy
-          git switch -c "q$QUARKUS_VERSION"
+          git switch -c "$BRANCH_NAME-to-q$QUARKUS_VERSION"
           
       - name: Check if current base checksum exists
         if: ${{ env.UPGRADE }}
@@ -169,7 +172,7 @@ jobs:
         if: ${{ env.UPGRADE }}
         run: |
           cd working-copy
-          git push -u origin "q$QUARKUS_VERSION"
+          git push -u origin "$BRANCH_NAME-to-q$QUARKUS_VERSION"
         
       - name: Generate documentation links
         if: ${{ env.UPGRADE }}
@@ -186,7 +189,8 @@ jobs:
         if: ${{ env.UPGRADE }}
         run: |
           cd working-copy
-          gh pr create --title "Automated - Updated to Quarkus version $QUARKUS_VERSION" \
+          gh pr create --base "$BRANCH_NAME" \
+            --title "Automated - Updated to Quarkus version $QUARKUS_VERSION" \
             --body "$GIT_MSG" \
             --assignee "$GITHUB_REPOSITORY_OWNER"
 

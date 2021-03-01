@@ -1,0 +1,106 @@
+
+#   Verify GitHub Action
+#   Copyright 2021 Jason Hambly
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+name: 'Verify GitHub Action'
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+
+  obtain_releases:
+    runs-on: ubuntu-latest
+    outputs:
+      release-list: ${{ steps.releases.outputs.release-list }}
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+    - name: Authenticate GitHub CLI
+      run: echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+    - name: Obtain Quarkus release listing
+      id: releases
+      run: echo "::set-output name=release-list::[\"$(gh release list --repo quarkusio/quarkus --limit 3 | grep '.Final' | awk '{print $1}' | sort -V | tr '\n' ',' | sed s'/,$//' | sed s'/,/\",\"/g' )\"]"
+
+  prepare_test_branches:
+    needs: [obtain_releases]
+    strategy:
+      max-parallel: 3
+      matrix:
+        release: ${{ fromJSON(needs.obtain_releases.outputs.release-list) }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Print release
+      run: echo ${{ matrix.release }}
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        path: test-copy
+    - name: Check for existing test branch
+      env:
+        CURRENT_VERSION: ${{ matrix.release }}
+      run: |
+        cd test-copy
+        echo "BRANCH_EXISTS=$(git branch --remotes | grep test-q$CURRENT_VERSION)" >> $GITHUB_ENV
+    - name: Create test project
+      continue-on-error: true
+      if: ${{ env.BRANCH_EXISTS != 0 }}
+      env:
+        CURRENT_VERSION: ${{ matrix.release }}
+      run: |
+        mvn "io.quarkus:quarkus-maven-plugin:$CURRENT_VERSION:create" \
+            -DprojectGroupId="org.example" \
+            -DprojectArtifactId="test-project" \
+            -Dextensions="io.quarkus:quarkus-rest-client-jaxb,io.quarkus:quarkus-smallrye-jwt"
+        echo "CONTINUE=$?" >> $GITHUB_ENV  
+    - name: Create an orphaned branch for testing
+      if: ${{ env.CONTINUE && env.BRANCH_EXISTS != 0 }}
+      env:
+        CURRENT_VERSION: ${{ matrix.release }}
+      run: |
+        cd test-copy
+        git checkout --orphan "test-q$CURRENT_VERSION"
+        git rm -rfq .
+        cp -anv ../test-project/. ./
+        git add -A
+        git config --global user.email "noreply@github.com"
+        git config --global user.name "automated"
+        git commit -m "Used for testing of quarkus $CURRENT_VERSION"
+        git push -u origin "test-q$CURRENT_VERSION"
+
+  determine_test_cases:
+    needs: [obtain_releases,prepare_test_branches]
+    runs-on: ubuntu-latest
+    outputs:
+      list: ${{ steps.test-cases.outputs.list }}
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+    - name: Test cases
+      id: test-cases
+      run: |
+        git branch --remotes | sed s'/^\s*origin\///' | grep "^test-q" | sed s'/^test-q//' | tr '\n' ' '
+        BRANCHES=$(git branch --remotes | sed s'/^\s*origin\///' | grep "^test-q" | sed s'/^test-q//' | tr '\n' ' ')
+        echo $BRANCHES
+        for branch in $BRANCHES
+        do
+          CASES+=(branch)
+        done
+        echo "::set-output name=list::$BRANCHES"
+    - name: Print release list
+      run: echo ${{ steps.test-cases.outputs.list }}
+
+#    - name: Test local action
+#      uses: ./
+
