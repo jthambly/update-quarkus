@@ -31,10 +31,10 @@ In this case, it will update files with newer ones and may remove any files **no
 
 *It is intended that this need will be removed in a later release, and the update process will attempt a best-effort approach.*
 
-*The following versions are known not to generate correctly:
+The following versions are known not to generate correctly:
  - 1.10.0.Final
  - 1.11.0.Final
- - 1.11.1.Final*
+ - 1.11.1.Final
 
 [**GIT_MSG - Migration Checklist**](.github/workflows/update-quarkus.yaml#L196)
 
