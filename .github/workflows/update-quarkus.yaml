@@ -46,10 +46,10 @@ jobs:
           filename: working-copy/pom.xml
         
       - name: Check for existing branches
-        run: echo "BRANCHES_EXISTS=$(git ls-remote | grep $BRANCH_NAME-q$QUARKUS_VERSION | wc -l)" >> $GITHUB_ENV
+        run: echo "NUM_BRANCHES_EXISTS=$(git ls-remote | grep $BRANCH_NAME-to-q$QUARKUS_VERSION | wc -l)" >> $GITHUB_ENV
           
       - name: Determine if there is an upgrade available and it has not commenced
-        if: ${{ env.CURRENT_VERSION != env.QUARKUS_VERSION && env.BRANCHES_EXISTS == 0 }}
+        if: ${{ env.CURRENT_VERSION != env.QUARKUS_VERSION && env.NUM_BRANCHES_EXISTS == 0 }}
         env:
           CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
         run: |
@@ -59,7 +59,7 @@ jobs:
         if: ${{ env.UPGRADE }}
         run: |
           cd working-copy
-          git switch -c "$BRANCH_NAME-q$QUARKUS_VERSION"
+          git switch -c "$BRANCH_NAME-to-q$QUARKUS_VERSION"
           
       - name: Check if current base checksum exists
         if: ${{ env.UPGRADE }}
