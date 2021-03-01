@@ -17,6 +17,8 @@
 name: 'Verify GitHub Action'
 on:
   pull_request:
+    branches:
+    - master
   workflow_dispatch:
 jobs:
 
