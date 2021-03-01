@@ -172,7 +172,7 @@ jobs:
         if: ${{ env.UPGRADE }}
         run: |
           cd working-copy
-          git push -u origin "$BRANCH_NAME-q$QUARKUS_VERSION"
+          git push -u origin "$BRANCH_NAME-to-q$QUARKUS_VERSION"
         
       - name: Generate documentation links
         if: ${{ env.UPGRADE }}
