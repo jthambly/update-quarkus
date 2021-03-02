@@ -65,17 +65,18 @@ runs:
         
   - name: Check for existing update branches
     shell: bash
+    working-directory: working-copy
     run: |
       echo 'Action -> Check for existing update branches'
 
-      echo "NUM_BRANCHES_EXISTS=$(git ls-remote | grep $BRANCH_NAME-to-q$QUARKUS_VERSION | wc -l)" >> $GITHUB_ENV
+      echo "BRANCH_EXISTS=$(git ls-remote | grep -q $BRANCH_NAME-to-q$QUARKUS_VERSION && echo true )" >> $GITHUB_ENV
           
   - name: Determine if there is an upgrade available and it has not commenced
     shell: bash
     run: |
       echo 'Action -> Determine if there is an upgrade available and it has not commenced'
 
-      if [[ "$CURRENT_VERSION" != "$QUARKUS_VERSION" && "$NUM_BRANCHES_EXISTS" == 0 ]]; then
+      if [[ "$CURRENT_VERSION" != "$QUARKUS_VERSION" && ! "$BRANCH_EXISTS" ]]; then
         echo "UPGRADE=true" >> $GITHUB_ENV
       fi
           
