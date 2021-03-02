@@ -54,8 +54,8 @@ jobs:
           
       - name: Create new branch for updated version
         if: ${{ env.UPGRADE }}
+        working-directory: working-copy
         run: |
-          cd working-copy
           git switch -c "q$QUARKUS_VERSION"
           
       - name: Check if current base checksum exists
@@ -120,8 +120,8 @@ jobs:
         if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS }}
         env:
           CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
+        working-directory: working-copy
         run: |
-          cd working-copy
           rm -f pom.xml $(sha256sum -c ".update/$CURRENT_VERSION.sha256" 2> /dev/null | grep ': OK' | sed 's/: OK$//' | tr '\n' ' ')
           find . -type d -empty -delete
           
@@ -153,23 +153,22 @@ jobs:
 
       - name: Set author information
         if: ${{ env.UPGRADE }}
+        working-directory: working-copy
         run: |
-          cd working-copy
           git config --global user.email "noreply@github.com"
           git config --global user.name "automated"
 
       - name: Commit changes
         if: ${{ env.UPGRADE }}
+        working-directory: working-copy
         run: |
-          cd working-copy
           git add -A
           git commit -m "Bump quarkus to $QUARKUS_VERSION"
 
       - name: Push upstream
         if: ${{ env.UPGRADE }}
-        run: |
-          cd working-copy
-          git push -u origin "q$QUARKUS_VERSION"
+        working-directory: working-copy
+        run: git push -u origin "q$QUARKUS_VERSION"
         
       - name: Generate documentation links
         if: ${{ env.UPGRADE }}
@@ -184,8 +183,8 @@ jobs:
 
       - name: Create a pull request
         if: ${{ env.UPGRADE }}
+        working-directory: working-copy
         run: |
-          cd working-copy
           gh pr create --title "Automated - Updated to Quarkus version $QUARKUS_VERSION" \
             --body "$GIT_MSG" \
             --assignee "$GITHUB_REPOSITORY_OWNER"
@@ -203,15 +202,13 @@ jobs:
             - [ ] File modifications reviewed
             - [ ] Automated checks performed
             - [ ] Manual QA performed
-        run: |
-          cd working-copy
-          gh pr comment --body "$GIT_MSG"
+        working-directory: working-copy
+        run: gh pr comment --body "$GIT_MSG"
 
       - name: Diagnostics - Git working status
         if: ${{ env.UPGRADE }}
-        run: |
-          cd working-copy
-          git status
+        working-directory: working-copy
+        run: git status
         
       - name: Diagnostics - Get a tree listing of directory contents
         run: tree -a .
