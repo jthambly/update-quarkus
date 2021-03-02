@@ -43,7 +43,7 @@ The following blank project versions are known not to generate correctly:
 Upon the creation of a pull request, a checklist will be added as a comment. 
 A basic checklist has already been provided, but you may wish to update it for your requirements.
 
-## Future direction
+## Under Development - GitHub Action
 
 Development work is underway to create this as a custom GitHub Action to make this simpler. If you wish to try this out please continue reading.
 
