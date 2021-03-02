@@ -88,7 +88,7 @@ jobs:
         filename: working-copy/pom.xml
 
     - name: quarkus-update-action
-      uses: jthambly/update-quarkus@v1.0.6
+      uses: jthambly/update-quarkus@v1.0.7
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
       env:
