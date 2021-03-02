@@ -34,7 +34,7 @@ jobs:
       run: echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
     - name: Obtain Quarkus release listing
       id: releases
-      run: echo "::set-output name=release-list::[\"$(gh release list --repo quarkusio/quarkus --limit 5 | grep '.Final' | awk '{print $1}' | sort -V | tr '\n' ',' | sed s'/,$//' | sed s'/,/\",\"/g' )\"]"
+      run: echo "::set-output name=release-list::[\"$(gh release list --repo quarkusio/quarkus --limit 10 | grep '.Final' | awk '{print $1}' | sort -V | tr '\n' ',' | sed s'/,$//' | sed s'/,/\",\"/g' )\"]"
     - name: Obtain test branch list
       id: test-branches
       run: echo "::set-output name=branch-list::[{release:\"$(git ls-remote | grep 'refs/heads/test-q' | grep -v 'Final-' | sed s'/^.*test-q//' | tr '\n' ',' | sed s'/^,//' | sed s'/,$//' | sed s'/,/\"\},\{release:\"/g')\"}]"
