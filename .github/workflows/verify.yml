@@ -141,3 +141,9 @@ jobs:
           gh pr close "$PR_BRANCH" --delete-branch
         fi
 
+  verify_complete:
+    needs: [verify_update_action]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Completion stage for branch protection rules
+      run: echo 'Complete'
