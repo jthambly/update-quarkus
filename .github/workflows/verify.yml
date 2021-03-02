@@ -104,7 +104,7 @@ jobs:
   verify_update_action:
     needs: [determine_test_cases]
     strategy:
-      max-parallel: 1
+      max-parallel: 3
       matrix:
         release: ${{ fromJSON(needs.determine_test_cases.outputs.release-list) }}
     runs-on: ubuntu-latest
