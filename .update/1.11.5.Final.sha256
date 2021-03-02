@@ -1,0 +1,16 @@
+f0cd622d1db62eb688cc424bed1edfa2cee57dd5eff24aeb656618684be42069  ./src/test/java/org/example/NativeGreetingResourceIT.java
+1e6ab2197c4502f1e8d6551d45c2cd4f0d9f5007d5daccd341158c81962d543c  ./src/test/java/org/example/GreetingResourceTest.java
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./src/main/resources/application.properties
+db50606ad1bb826d0348940d19907c30c87bd3ee6ae98224122365cb35f32baa  ./src/main/resources/META-INF/resources/index.html
+7c2ac727aed6eb4f35aecb63818154034ffae52bc2894505036121822a6133ca  ./src/main/docker/Dockerfile.jvm
+3ee7894b31d9673b4dc275bd79e7f2378a7af53cec2de7f84de0341921da793e  ./src/main/docker/Dockerfile.native
+3c84390f4f4f9087086deaff10e89ef6b71029f134eaa64bb7bcf2555a6a32bd  ./src/main/docker/Dockerfile.fast-jar
+55266166432dfb6808237f2e69eafc8b2df6aa8f57399766870b0118a6f73eef  ./src/main/java/org/example/GreetingResource.java
+665fa927aa8d42c567a1a5155f33cdfa087ca598fc22423be2964889e00645d8  ./pom.xml
+2744729bf853b76866b7c074b86ea7339dc170a2a067cbaa81da966e6a1bbd44  ./mvnw
+420d1331e8b51a2699d16c61801e38972374fd6a20a1b3efb084fbd9ec511a80  ./README.md
+b5817070717211a9f690c5e2799fcd7317563f1aac8be2e94c5e5e653246da23  ./.gitignore
+39b0bd3b7287783b4c4a24b533ea13483f7b7c7f59d2b5d9eb7c3f0ca1786d35  ./.dockerignore
+d58f5e1a2bf0ccc6a6d3e0bd24f95bd6b60ff1dfe4d10f26c752621d5c4b1956  ./mvnw.cmd
+875ba7fa5071e735f13447ddd25ff9f7fa93b9a9e1426922fb10c9a0b35ece5b  ./.mvn/wrapper/MavenWrapperDownloader.java
+17212155ffb218cc21cc91fdf298d85a4a2628af308b155d89cd56d5ce973a44  ./.mvn/wrapper/maven-wrapper.properties
