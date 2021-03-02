@@ -1,0 +1,306 @@
+
+#   Quarkus update GitHub Action
+#   Copyright 2021 Jason Hambly
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+name: 'quarkus-update-action'
+author: 'Jason Hambly www.linkedin.com/in/jason-hambly'
+description: 'Update the version of Quarkus within your project'
+inputs:
+  github_token:
+    description: 'Pass GitHub token to allow Action to perform tasks'
+    required: true
+  diagnostics:
+    description: '(Optional) Print additional information at the end.'
+    required: false
+    default: false
+runs:
+  using: 'composite'
+  steps:
+  
+  # Excluded checkout procedure - done from parent workflow.
+
+  - name: Check that working-copy directory exists
+    shell: bash
+    run: |
+      if [[ ! -d working-copy ]]; then
+        echo 'The working-copy directory does not exist'
+        exit 1
+      fi
+
+  - name: Authenticate GitHub CLI
+    shell: bash
+    run: |
+      echo 'Action -> Authenticate GitHub CLI'
+
+      echo ${{ inputs.github_token }} | gh auth login --with-token
+
+  - name: Set friendly branch name
+    shell: bash
+    working-directory: working-copy
+    run: |
+      echo 'Action -> Set friendly branch name'
+
+      echo "BRANCH_NAME=$(git branch --list | grep '^*.' | sed s'/^*.//')" >> $GITHUB_ENV
+
+  - name: Obtain Quarkus release information
+    shell: bash
+    run: |
+      echo 'Action -> Obtain Quarkus release information'
+
+      echo "QUARKUS_VERSION=$(gh release list --repo quarkusio/quarkus | grep ".Final" | awk '{print $1}' | sort -V | tail -1 )" >> $GITHUB_ENV
+
+    # Excluded gathering POM information - done from parent workflow.
+        
+  - name: Check for existing update branches
+    shell: bash
+    run: |
+      echo 'Action -> Check for existing update branches'
+
+      echo "NUM_BRANCHES_EXISTS=$(git ls-remote | grep $BRANCH_NAME-to-q$QUARKUS_VERSION | wc -l)" >> $GITHUB_ENV
+          
+  - name: Determine if there is an upgrade available and it has not commenced
+    shell: bash
+    run: |
+      echo 'Action -> Determine if there is an upgrade available and it has not commenced'
+
+      if [[ "$CURRENT_VERSION" != "$QUARKUS_VERSION" && "$NUM_BRANCHES_EXISTS" == 0 ]]; then
+        echo "UPGRADE=true" >> $GITHUB_ENV
+      fi
+          
+  - name: Create new branch for updated version
+    shell: bash
+    working-directory: working-copy
+    run: |
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+
+      echo 'Action -> Create new branch for updated version'
+
+      git switch -c "$BRANCH_NAME-to-q$QUARKUS_VERSION"
+      
+  - name: Check if current base checksum exists
+    shell: bash
+    working-directory: working-copy
+    run: |
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+
+      echo 'Action -> Check if current base checksum exists'
+
+      echo "CHK_SUM_EXISTS=$(test -e .update/$CURRENT_VERSION.sha256)" >> $GITHUB_ENV
+          
+  - name: Generate current base build
+    shell: bash
+    run: |
+      if [[ ! "$UPGRADE" || "$CHK_SUM_EXISTS" ]]; then exit 0; fi # Skip - not upgrading, or checksum exists
+
+      echo 'Action -> Generate current base build'
+
+      mkdir -p old
+      cd old
+      mvn --quiet "io.quarkus:quarkus-maven-plugin:$CURRENT_VERSION:create" \
+        -DprojectGroupId="$PROJECT_GROUP" \
+        -DprojectArtifactId="$PROJECT_NAME" \
+        -Dextensions="$QUARKUS_EXT"
+
+      exit 0 # continue-on-error
+          
+  - name: Generate checksums of current base build
+    shell: bash
+    run: |
+      if [[ ! "$UPGRADE" || "$CHK_SUM_EXISTS" ]]; then exit 0; fi # Skip - not upgrading, or checksum exists
+
+      echo 'Action -> Generate checksums of current base build'
+
+      mkdir -p working-copy/.update && \
+      cd "old/$PROJECT_NAME" && \
+      find . -type f | xargs sha256sum > "../../working-copy/.update/$CURRENT_VERSION.sha256" && \
+      echo "CHK_SUM_EXISTS=true" >> $GITHUB_ENV
+
+      exit 0 # continue-on-error
+
+  - name: Generate latest base build
+    shell: bash
+    run: |
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+
+      echo 'Action -> Generate latest base build'
+
+      mkdir -p new
+      cd new
+      mvn --quiet "io.quarkus:quarkus-maven-plugin:$QUARKUS_VERSION:create" \
+        -DprojectGroupId="$PROJECT_GROUP" \
+        -DprojectArtifactId="$PROJECT_NAME" \
+        -Dextensions="$QUARKUS_EXT"
+          
+  - name: Generate checksums of latest base build
+    shell: bash
+    run: |
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+
+      echo 'Action -> Generate checksums of latest base build'
+
+      mkdir -p working-copy/.update
+      cd "new/$PROJECT_NAME"
+      find . -type f | xargs sha256sum > "../../working-copy/.update/$QUARKUS_VERSION.sha256"
+        
+  - name: Remove older Quarkus files based on matching checksums
+    shell: bash
+    working-directory: working-copy
+    run: |
+      if [[ ! "$UPGRADE" || ! "$CHK_SUM_EXISTS" ]]; then exit 0; fi # Skip - not upgrading, or checksum does not exist
+
+      echo 'Action -> Remove older Quarkus files based on matching checksums'
+
+      rm -f pom.xml $(sha256sum -c ".update/$CURRENT_VERSION.sha256" 2> /dev/null | grep ': OK' | sed 's/: OK$//' | tr '\n' ' ')
+      find . -type d -empty -delete
+         
+  - name: Update file structure using Copy
+    shell: bash
+    run: |
+      if [[ ! "$UPGRADE" || ! "$CHK_SUM_EXISTS" ]]; then exit 0; fi # Skip - not upgrading, or checksum does not exist
+
+      echo 'Action -> Update file structure using Copy'
+
+      cp -anv "new/$PROJECT_NAME/." "working-copy/"
+
+  - name: Update file structure using Rsync
+    shell: bash
+    env:
+      PROJECT_FILES: |
+        .git/
+        .github/
+        src/main/java/
+        src/main/resources/
+        src/test/
+        LICENCE
+        README
+    run: |
+      if [[ ! "$UPGRADE" || "$CHK_SUM_EXISTS" ]]; then exit 0; fi # Skip - not upgrading, or checksum exists
+
+      echo 'Action -> Update file structure using Rsync'
+
+      echo "$PROJECT_FILES" | rsync -av --delete --exclude-from=- "new/$PROJECT_NAME/" "working-copy/"
+
+  - name: Set git author information
+    shell: bash
+    working-directory: working-copy
+    run: |
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+
+      echo 'Action -> Set git author information'
+
+      git config --global user.email "noreply@github.com"
+      git config --global user.name "automated"
+
+  - name: Commit changes
+    shell: bash
+    working-directory: working-copy
+    run: |
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+
+      echo 'Action -> Commit changes'
+
+      git add -A
+      git commit -m "Bump quarkus to $QUARKUS_VERSION"
+
+  - name: Push upstream
+    shell: bash
+    working-directory: working-copy
+    run: |
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+
+      echo 'Action -> Push upstream'
+
+      git push -u origin "$BRANCH_NAME-to-q$QUARKUS_VERSION"
+      
+  - name: Generate documentation links
+    shell: bash
+    run: |
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+      
+      echo 'Action -> Generate documentation links'
+
+      QUARKUS_VERSION_MAJOR_MINOR=$( echo $QUARKUS_VERSION | awk -F'.' '{print $1"."$2}' )
+      echo "GIT_DOCS<<EOE" >> $GITHUB_ENV
+      echo "A new Quarkus version has been applied and is ready for review." >> $GITHUB_ENV
+      echo "" >> $GITHUB_ENV
+      echo "[Release Information - $QUARKUS_VERSION](https://github.com/quarkusio/quarkus/releases/tag/$QUARKUS_VERSION)" >> $GITHUB_ENV
+      echo "[Migration Guide - $QUARKUS_VERSION](https://github.com/quarkusio/quarkus/wiki/Migration-Guide-$QUARKUS_VERSION_MAJOR_MINOR)" >> $GITHUB_ENV
+      echo "EOE" >> $GITHUB_ENV
+
+  - name: Create a pull request
+    shell: bash
+    working-directory: working-copy
+    run: |
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+      
+      echo 'Action -> Create a pull request'
+
+      gh pr create --base "$BRANCH_NAME" \
+        --title "Automated - Updated to Quarkus version $QUARKUS_VERSION" \
+        --body "$GIT_DOCS" \
+        --assignee "$GITHUB_REPOSITORY_OWNER"
+
+  - name: Add migration checklist
+    shell: bash
+    env:
+      GIT_CHKLIST: |
+        Migration Checklist:
+         
+        - [x] Reviewers and Assignees assigned
+        - [x] Link to Migration Documentation provided
+        - [ ] Migration Documentation reviewed
+        - [ ] Changes reviewed against existing project
+        - [ ] File modifications reviewed
+        - [ ] Automated checks performed
+        - [ ] Manual QA performed
+    working-directory: working-copy
+    run: |
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+
+      echo 'Action -> Add migration checklist'
+
+      gh pr comment --body "$GIT_CHKLIST"
+
+  - name: Diagnostics - Git working status
+    shell: bash
+    working-directory: working-copy
+    run: |
+      if [[ ! "$UPGRADE" || "${{ inputs.diagnostics }}" == false ]]; then exit 0; fi # Skip - not upgrading, or no diagnostics needed
+
+      echo 'Action -> Diagnostics - Git working status'
+
+      git status
+       
+  - name: Diagnostics - Get a tree listing of directory contents
+    shell: bash
+    run: |
+      if [[ "${{ inputs.diagnostics }}" == false ]]; then exit 0; fi # Skip - no diagnostics needed
+
+      echo 'Action -> Diagnostics - Get a tree listing of directory contents'
+
+      tree -a .
+
+  - name: Diagnostics - List environment variables
+    shell: bash
+    run: |
+      if [[ "${{ inputs.diagnostics }}" == false ]]; then exit 0; fi # Skip - no diagnostics needed
+
+      echo 'Action -> Diagnostics - List environment variables'
+
+      env
+
+branding:
+  icon: code
+  color: blue
