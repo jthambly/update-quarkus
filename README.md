@@ -1,4 +1,4 @@
-[![Verify GitHub Action](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml/badge.svg?branch=master)](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml)
+[![Verify GitHub Action](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml/badge.svg)](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml)
 
 # update-quarkus
 
