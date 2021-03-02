@@ -1,0 +1,31 @@
+name: update-quarkus-action
+on:
+  schedule:
+  - cron: '0 0 * * 6'
+  workflow_dispatch:
+  
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out the repository using working-copy as its path
+      uses: actions/checkout@v2
+      with:
+        path: working-copy
+
+    - name: Gather Existing POM information
+      id: quarkus-pom
+      uses: jthambly/quarkus-pom-action@v1
+      with:
+        filename: working-copy/pom.xml
+
+    - name: quarkus-update-action
+      uses: jthambly/update-quarkus@v1.0.7
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+      env:
+        CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
+        PROJECT_GROUP: ${{ steps.quarkus-pom.outputs.project_group }}
+        PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
+        QUARKUS_EXT: ${{ steps.quarkus-pom.outputs.quarkus_extensions }}

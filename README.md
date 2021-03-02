@@ -1,4 +1,4 @@
-[![Verify GitHub Action](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml/badge.svg?branch=master)](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml)
+[![Verify GitHub Action](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml/badge.svg)](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml)
 
 # update-quarkus
 
@@ -87,8 +87,8 @@ jobs:
       with:
         filename: working-copy/pom.xml
 
-    - name: Update Quarkus version
-      uses: jthambly/quarkus-update-action@v1.0.6
+    - name: quarkus-update-action
+      uses: jthambly/update-quarkus@v1.0.7
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
       env:
