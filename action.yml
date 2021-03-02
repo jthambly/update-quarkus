@@ -21,6 +21,10 @@ inputs:
   github_token:
     description: 'Pass GitHub token to allow Action to perform tasks'
     required: true
+  diagnostics:
+    description: '(Optional) Print additional information at the end.'
+    required: false
+    default: false
 runs:
   using: 'composite'
   steps:
@@ -273,7 +277,7 @@ runs:
     shell: bash
     working-directory: working-copy
     run: |
-      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+      if [[ ! "$UPGRADE" || "${{ inputs.diagnostics }}" == false ]]; then exit 0; fi # Skip - not upgrading, or no diagnostics needed
 
       echo 'Action -> Diagnostics - Git working status'
 
@@ -282,6 +286,8 @@ runs:
   - name: Diagnostics - Get a tree listing of directory contents
     shell: bash
     run: |
+      if [[ "${{ inputs.diagnostics }}" == false ]]; then exit 0; fi # Skip - no diagnostics needed
+
       echo 'Action -> Diagnostics - Get a tree listing of directory contents'
 
       tree -a .
@@ -289,6 +295,8 @@ runs:
   - name: Diagnostics - List environment variables
     shell: bash
     run: |
+      if [[ "${{ inputs.diagnostics }}" == false ]]; then exit 0; fi # Skip - no diagnostics needed
+
       echo 'Action -> Diagnostics - List environment variables'
 
       env
