@@ -93,7 +93,7 @@ jobs:
         run: |
           mkdir -p working-copy/.update && \
           cd "old/$PROJECT_NAME" && \
-          find . -type f | xargs sha256sum > "../../working-copy/.update/$CURRENT_VERSION.sha256" && \
+          find . -type f | xargs sha256sum > "$GITHUB_WORKSPACE/working-copy/.update/$CURRENT_VERSION.sha256" && \
           echo "CHK_SUM_EXISTS=0" >> $GITHUB_ENV
 
       - name: Generate latest base build
@@ -118,7 +118,7 @@ jobs:
         run: |
           mkdir -p working-copy/.update
           cd "new/$PROJECT_NAME"
-          find . -type f | xargs sha256sum > "../../working-copy/.update/$QUARKUS_VERSION.sha256"
+          find . -type f | xargs sha256sum > "$GITHUB_WORKSPACE/working-copy/.update/$QUARKUS_VERSION.sha256"
           
       - name: Remove older Quarkus files based on matching checksums
         if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS }}
