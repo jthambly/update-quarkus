@@ -72,7 +72,7 @@ runs:
       echo "CURRENT_VERSION=$(cat pom.xml | grep '^\s*<quarkus.platform.version>' | sed 's/<\/.*$//' | sed 's/^.*>//')"  >> $GITHUB_ENV
       echo "PROJECT_GROUP=$(cat pom.xml | grep -A 3 '^\s*<modelVersion>' | grep '^\s*<groupId>' | sed 's/<\/.*$//' | sed 's/^.*>//')"  >> $GITHUB_ENV
       echo "PROJECT_NAME=$(cat pom.xml | grep -A 3 '^\s*<modelVersion>' | grep '^\s*<artifactId>' | sed 's/<\/.*$//' | sed 's/^.*>//')"  >> $GITHUB_ENV
-      echo "QUARKUS_EXT=$(cat pom.xml | grep -A 3 '^\s*<dependency>' | grep 'groupId\|artifactId' | sed 's/<\/.*$//' | sed 's/^.*>//' | grep -v '\$' | sed 'N;s/\n/:/' | uniq | sort | tr '\n' ',' | sed 's/,$//')"  >> $GITHUB_ENV
+      echo "QUARKUS_EXT=$(cat pom.xml | grep -A 3 '^\s*<dependency>' | grep 'groupId\|artifactId' | sed 's/<\/.*$//' | sed 's/^.*>//' | grep -v '\$' | sed 'N;s/\n/:/' | sort | uniq | tr '\n' ',' | sed 's/,$//')"  >> $GITHUB_ENV
         
   - name: Check for existing update branches
     shell: bash
