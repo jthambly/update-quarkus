@@ -65,7 +65,9 @@ If you wish to print out additional information such as the working tree, or env
 
 ```
 
-name: update-quarkus
+# Update your Quarkus project to a newer version
+
+name: quarkus-update-action
 on:
   schedule:
   - cron: '0 0 * * 0'

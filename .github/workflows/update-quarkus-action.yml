@@ -1,4 +1,6 @@
-name: update-quarkus-action
+# Update your Quarkus project to a newer version
+
+name: quarkus-update-action
 on:
   schedule:
   - cron: '0 0 * * 3'
