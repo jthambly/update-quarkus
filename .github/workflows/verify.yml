@@ -118,18 +118,8 @@ jobs:
       with:
         ref: "test-q${{ matrix.release }}"
         path: working-copy
-    - name: Gather Existing POM information
-      id: quarkus-pom
-      uses: jthambly/quarkus-pom-action@v1
-      with:
-        filename: working-copy/pom.xml
     - name: TEST LOCAL ACTION
       uses: ./
-      env:
-        CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
-        PROJECT_GROUP: ${{ steps.quarkus-pom.outputs.project_group }}
-        PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
-        QUARKUS_EXT: ${{ steps.quarkus-pom.outputs.quarkus_extensions }}
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Clean up - delete pull request and branch
