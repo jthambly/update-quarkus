@@ -84,7 +84,7 @@ jobs:
         path: working-copy
 
     - name: Update Quarkus version
-      uses: jthambly/update-quarkus@v1.0.8
+      uses: jthambly/update-quarkus@v1.0.9
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
 

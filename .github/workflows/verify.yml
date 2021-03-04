@@ -22,6 +22,9 @@ on:
   workflow_dispatch:
 jobs:
 
+
+  # Obtain release and branch information relevant for testing
+
   obtain_releases:
     runs-on: ubuntu-latest
     outputs:
@@ -38,6 +41,9 @@ jobs:
     - name: Obtain test branch list
       id: test-branches
       run: echo "::set-output name=branch-list::[{release:\"$(git ls-remote | grep 'refs/heads/test-q' | grep -v 'Final-' | sed s'/^.*test-q//' | tr '\n' ',' | sed s'/^,//' | sed s'/,$//' | sed s'/,/\"\},\{release:\"/g')\"}]"
+
+
+  # Create new test branches for new versions of Quarkus
 
   prepare_test_branches:
     needs: [obtain_releases]
@@ -81,6 +87,9 @@ jobs:
         git commit -m "Used for testing of quarkus $CURRENT_VERSION"
         git push -u origin "test-q$CURRENT_VERSION"
 
+
+  # Determine test cases based on selected versions, and available branches
+
   determine_test_cases:
     needs: [obtain_releases,prepare_test_branches]
     runs-on: ubuntu-latest
@@ -100,6 +109,9 @@ jobs:
       run: |
         # wanted_releases = (releases - non-exitent) => wanted_releases = (releases - (releases-branches) )
         echo "::set-output name=list::$( echo $RELEASES | jq --compact-output --argjson releases $RELEASES --argjson branches $BRANCHES '.-($releases-$branches)' )"
+
+
+  # Run update tests on a select number of test versions
 
   verify_update_action:
     needs: [determine_test_cases,branch_clean_up]
@@ -122,6 +134,12 @@ jobs:
       uses: ./
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload checksum artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: "${{ matrix.release }}-checksums"
+        path: "${{ github.workspace }}/working-copy/.update/"
+        retention-days: 1
     - name: Clean up - delete pull request and branch
       working-directory: working-copy
       run: |
@@ -131,6 +149,7 @@ jobs:
           gh pr close "$PR_BRANCH" --delete-branch
         fi
 
+
   # Clean up any remaining test Pull Requests and Branches
 
   branch_clean_up:
@@ -139,6 +158,7 @@ jobs:
     steps:
     - name: TODO
       run: echo TODO
+
 
   # Verify that the POM information is been collected as expected
 
@@ -183,10 +203,53 @@ jobs:
           git switch "test-q${{ matrix.release }}" # Switch before deletion
           gh pr close "$PR_BRANCH" --delete-branch
         fi
-    
+
+
+  # Completion and upload checksums
+
   verify_complete:
     needs: [verify_update_action,verify_pom_information]
     runs-on: ubuntu-latest
     steps:
-    - name: Completion stage for branch protection rules
-      run: echo 'Complete'
+    - name: Checkout action repo
+      uses: actions/checkout@v2
+      with:
+        path: working-copy
+    - name: Switch to source branch
+      if: ${{ github.event_name == 'pull_request' }}
+      working-directory: working-copy
+      run: |
+        git fetch --all --quiet
+        git switch "${{ github.head_ref }}"
+    - name: Download checksum artifacts
+      uses: actions/download-artifact@v2
+      with: 
+        path: checksums
+    - name: Ensure update directory exists
+      working-directory: working-copy
+      run: mkdir -p .update
+    - name: Copy into repo
+      continue-on-error: true
+      working-directory: checksums
+      run: find . -type f -exec cp -u {} "$GITHUB_WORKSPACE/working-copy/.update/" \;
+    - name: Combine all checksums
+      working-directory: 'working-copy/.update'
+      run: |
+        cat *.sha256 | sort | uniq > checksums_combined
+        cat checksums_combined | awk '{print $2}' | sort | uniq > filenames_combined
+    - name: Add files to repository
+      working-directory: working-copy
+      run: |
+        if [[ $(git status --short | wc -l) != 0 ]]; then
+          git status --short
+          git config --global user.email "noreply@github.com"
+          git config --global user.name "automated"
+          git add --all .update/
+          git commit -m "Updated checksums"
+          echo "CHECKSUM_UPDATE=true" >> $GITHUB_ENV
+        fi
+    - name: Push repository changes upstream
+      if: ${{ env.CHECKSUM_UPDATE }}
+      working-directory: working-copy
+      run: |
+        git push
