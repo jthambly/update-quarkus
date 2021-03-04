@@ -243,5 +243,7 @@ jobs:
     - name: Push repository changes upstream
       working-directory: working-copy
       run: |
+        git branch --list
+        git ls-remote
         BRANCH_NAME="$(git branch --list | grep '^*.' | sed s'/^*.//')"
         git push -u origin "$BRANCH_NAME"
