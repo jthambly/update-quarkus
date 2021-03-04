@@ -65,7 +65,9 @@ If you wish to print out additional information such as the working tree, or env
 
 ```
 
-name: update-quarkus
+# Update your Quarkus project to a newer version
+
+name: quarkus-update-action
 on:
   schedule:
   - cron: '0 0 * * 0'
@@ -81,20 +83,9 @@ jobs:
       with:
         path: working-copy
 
-    - name: Gather Existing POM information
-      id: quarkus-pom
-      uses: jthambly/quarkus-pom-action@v1
-      with:
-        filename: working-copy/pom.xml
-
-    - name: quarkus-update-action
-      uses: jthambly/update-quarkus@v1.0.7
+    - name: Update Quarkus version
+      uses: jthambly/update-quarkus@v1.0.8
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-      env:
-        CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
-        PROJECT_GROUP: ${{ steps.quarkus-pom.outputs.project_group }}
-        PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
-        QUARKUS_EXT: ${{ steps.quarkus-pom.outputs.quarkus_extensions }}
 
 ```

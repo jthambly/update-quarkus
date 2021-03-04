@@ -61,7 +61,18 @@ runs:
 
       echo "QUARKUS_VERSION=$(gh release list --repo quarkusio/quarkus | grep ".Final" | awk '{print $1}' | sort -V | tail -1 )" >> $GITHUB_ENV
 
-    # Excluded gathering POM information - done from parent workflow.
+    # Excluded gathering POM information from custom Action.
+  - name: Gather Existing POM information
+    id: quarkus-pom
+    shell: bash
+    working-directory: working-copy
+    run: |
+      echo 'Action -> Gather Existing POM information'
+
+      echo "CURRENT_VERSION=$(cat pom.xml | grep '^\s*<quarkus.platform.version>' | sed 's/<\/.*$//' | sed 's/^.*>//')"  >> $GITHUB_ENV
+      echo "PROJECT_GROUP=$(cat pom.xml | grep -A 3 '^\s*<modelVersion>' | grep '^\s*<groupId>' | sed 's/<\/.*$//' | sed 's/^.*>//')"  >> $GITHUB_ENV
+      echo "PROJECT_NAME=$(cat pom.xml | grep -A 3 '^\s*<modelVersion>' | grep '^\s*<artifactId>' | sed 's/<\/.*$//' | sed 's/^.*>//')"  >> $GITHUB_ENV
+      echo "QUARKUS_EXT=$(cat pom.xml | grep -A 3 '^\s*<dependency>' | grep 'groupId\|artifactId' | sed 's/<\/.*$//' | sed 's/^.*>//' | grep -v '\$' | sed 'N;s/\n/:/' | sort | uniq | tr '\n' ',' | sed 's/,$//')"  >> $GITHUB_ENV
         
   - name: Check for existing update branches
     shell: bash
@@ -125,7 +136,7 @@ runs:
 
       mkdir -p working-copy/.update && \
       cd "old/$PROJECT_NAME" && \
-      find . -type f | xargs sha256sum > "../../working-copy/.update/$CURRENT_VERSION.sha256" && \
+      find . -type f | xargs sha256sum > "$GITHUB_WORKSPACE/working-copy/.update/$CURRENT_VERSION.sha256" && \
       echo "CHK_SUM_EXISTS=true" >> $GITHUB_ENV
 
       exit 0 # continue-on-error
@@ -153,7 +164,7 @@ runs:
 
       mkdir -p working-copy/.update
       cd "new/$PROJECT_NAME"
-      find . -type f | xargs sha256sum > "../../working-copy/.update/$QUARKUS_VERSION.sha256"
+      find . -type f | xargs sha256sum > "$GITHUB_WORKSPACE/working-copy/.update/$QUARKUS_VERSION.sha256"
         
   - name: Remove older Quarkus files based on matching checksums
     shell: bash

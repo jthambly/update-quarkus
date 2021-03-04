@@ -102,7 +102,7 @@ jobs:
         echo "::set-output name=list::$( echo $RELEASES | jq --compact-output --argjson releases $RELEASES --argjson branches $BRANCHES '.-($releases-$branches)' )"
 
   verify_update_action:
-    needs: [determine_test_cases]
+    needs: [determine_test_cases,branch_clean_up]
     strategy:
       max-parallel: 3
       matrix:
@@ -118,18 +118,8 @@ jobs:
       with:
         ref: "test-q${{ matrix.release }}"
         path: working-copy
-    - name: Gather Existing POM information
-      id: quarkus-pom
-      uses: jthambly/quarkus-pom-action@v1
-      with:
-        filename: working-copy/pom.xml
     - name: TEST LOCAL ACTION
       uses: ./
-      env:
-        CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
-        PROJECT_GROUP: ${{ steps.quarkus-pom.outputs.project_group }}
-        PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
-        QUARKUS_EXT: ${{ steps.quarkus-pom.outputs.quarkus_extensions }}
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Clean up - delete pull request and branch
@@ -141,8 +131,61 @@ jobs:
           gh pr close "$PR_BRANCH" --delete-branch
         fi
 
+  # Clean up any remaining test Pull Requests and Branches
+
+  branch_clean_up:
+    needs: [obtain_releases]
+    runs-on: ubuntu-latest
+    steps:
+    - name: TODO
+      run: echo TODO
+
+  # Verify that the POM information is been collected as expected
+
+  verify_pom_information:
+    needs: [prepare_test_branches,branch_clean_up]
+    strategy:
+      matrix:
+        release: ['1.10.5.Final']
+    runs-on: ubuntu-latest
+    steps:
+    - name: Print release
+      run: echo ${{ matrix.release }}
+    - name: Checkout action repo
+      uses: actions/checkout@v2
+    - name: Checkout working repo
+      uses: actions/checkout@v2
+      with:
+        ref: "test-q${{ matrix.release }}"
+        path: working-copy
+    - name: Modify Quarkus extenstions
+      working-directory: working-copy
+      run: |
+        mvn --quiet quarkus:add-extension -Dextensions="io.quarkus:quarkus-flyway,io.quarkus:quarkus-infinispan-client"
+    - name: TEST LOCAL ACTION
+      uses: ./
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        diagnostics: true
+    - name: verify expected values
+      run: |
+        [[ 
+          "$CURRENT_VERSION" == "${{ matrix.release }}" && 
+          "$PROJECT_GROUP" == "org.example" &&
+          "$PROJECT_NAME" == "test-project" &&
+          $(echo -n "$QUARKUS_EXT" | sha256sum | cut -c-64) == "60829d08d153ecd87c3d8aeaed1de091d3d44874276bbc52fc620b5a9dd13398"
+        ]]
+    - name: Clean up - delete pull request and branch
+      working-directory: working-copy
+      run: |
+        PR_BRANCH=$( gh pr list | grep "test-q${{ matrix.release }}" | grep OPEN | awk -F'\t' '{print $3}' )
+        if [[ ! -z "$PR_BRANCH" ]]; then
+          git switch "test-q${{ matrix.release }}" # Switch before deletion
+          gh pr close "$PR_BRANCH" --delete-branch
+        fi
+    
   verify_complete:
-    needs: [verify_update_action]
+    needs: [verify_update_action,verify_pom_information]
     runs-on: ubuntu-latest
     steps:
     - name: Completion stage for branch protection rules
