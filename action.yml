@@ -109,7 +109,7 @@ runs:
 
       echo 'Action -> Check if current base checksum exists'
 
-      echo "CHK_SUM_EXISTS=$(test -e .update/$CURRENT_VERSION.sha256)" >> $GITHUB_ENV
+      echo "CHK_SUM_EXISTS=$(test -e .update/$CURRENT_VERSION.sha256 && echo true)" >> $GITHUB_ENV
           
   - name: Generate current base build
     shell: bash

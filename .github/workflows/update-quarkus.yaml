@@ -66,10 +66,10 @@ jobs:
         if: ${{ env.UPGRADE }}
         env:
           CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
-        run: echo "CHK_SUM_EXISTS=$(test -e working-copy/.update/$CURRENT_VERSION.sha256; echo $?)" >> $GITHUB_ENV   
+        run: echo "CHK_SUM_EXISTS=$(test -e working-copy/.update/$CURRENT_VERSION.sha256 && echo true)" >> $GITHUB_ENV   
           
       - name: Generate current base build
-        if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS != 0  }}
+        if: ${{ env.UPGRADE && ! env.CHK_SUM_EXISTS }}
         continue-on-error: true
         env:
           CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
@@ -85,7 +85,7 @@ jobs:
             -Dextensions="$QUARKUS_EXTENSIONS"
              
       - name: Generate checksums of current base build
-        if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS != 0 }}
+        if: ${{ env.UPGRADE && ! env.CHK_SUM_EXISTS }}
         continue-on-error: true
         env:
           CURRENT_VERSION: ${{ steps.quarkus-pom.outputs.current_version }}
@@ -94,7 +94,7 @@ jobs:
           mkdir -p working-copy/.update && \
           cd "old/$PROJECT_NAME" && \
           find . -type f | xargs sha256sum > "$GITHUB_WORKSPACE/working-copy/.update/$CURRENT_VERSION.sha256" && \
-          echo "CHK_SUM_EXISTS=0" >> $GITHUB_ENV
+          echo "CHK_SUM_EXISTS=true" >> $GITHUB_ENV
 
       - name: Generate latest base build
         if: ${{ env.UPGRADE }}
@@ -140,7 +140,7 @@ jobs:
         run: cp -anv "new/$PROJECT_NAME/." "working-copy/"
 
       - name: Update file structure using Rsync
-        if: ${{ env.UPGRADE && env.CHK_SUM_EXISTS != 0 }}
+        if: ${{ env.UPGRADE && ! env.CHK_SUM_EXISTS }}
         env:
           PROJECT_NAME: ${{ steps.quarkus-pom.outputs.project_name }}
           PROJECT_FILES: |
