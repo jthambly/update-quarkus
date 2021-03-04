@@ -240,4 +240,5 @@ jobs:
         git status
     - name: Push repository changes upstream
       working-directory: working-copy
-      run: git push
+      if: ${{ github.event_name == 'pull_request' }}
+      run: git push orgin "$GITHUB_HEAD_REF"
