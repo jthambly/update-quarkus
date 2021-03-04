@@ -19,6 +19,7 @@ on:
   pull_request:
     branches:
     - master
+    - '!checksum_update*'
   workflow_dispatch:
 jobs:
 
@@ -248,7 +249,8 @@ jobs:
 
         git status --short
 
-        if [[ $(git add --all .update/) ]]; then
+        if [[ $(git status --short | wc -l) != 0 ]]; then
+          git add --all .update/
           git commit -m "Updated checksums"
           echo "CHECKSUM_UPDATE=true" >> $GITHUB_ENV
         fi
