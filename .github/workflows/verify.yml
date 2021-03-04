@@ -235,10 +235,12 @@ jobs:
         git config --global user.email "noreply@github.com"
         git config --global user.name "automated"
 
-        git add .update/
+        echo "Status before:" && git status --short
+        git add --all .update/
         git commit -m "Updated checksums"
-        git status
+        echo "Status after:" && git status --short
     - name: Push repository changes upstream
       working-directory: working-copy
-      if: ${{ github.event_name == 'pull_request' }}
-      run: git push orgin "$GITHUB_HEAD_REF"
+      run: |
+        BRANCH_NAME="$(git branch --list | grep '^*.' | sed s'/^*.//')"
+        git push -u origin "$BRANCH_NAME"
