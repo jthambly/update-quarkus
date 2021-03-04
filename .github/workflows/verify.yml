@@ -235,10 +235,11 @@ jobs:
         git config --global user.email "noreply@github.com"
         git config --global user.name "automated"
 
-        echo "Status before:" && git status --short
-        git add --all .update/
-        git commit -m "Updated checksums"
-        echo "Status after:" && git status --short
+        git status --short
+
+        if [[ $(git add --all .update/) ]]; then
+          git commit -m "Updated checksums"
+        fi
     - name: Push repository changes upstream
       working-directory: working-copy
       run: |
