@@ -134,6 +134,7 @@ jobs:
       uses: ./
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        diagnostics: true
     - name: Upload checksum artifacts
       uses: actions/upload-artifact@v2
       with:
