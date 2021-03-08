@@ -136,6 +136,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         diagnostics: true
         checklist: |
+          |
           Migration Checklist:
          
           - [x] Reviewers and Assignees assigned
@@ -145,6 +146,8 @@ jobs:
           - [ ] File modifications reviewed
           - [ ] Automated checks performed
           - [ ] Manual QA performed
+    - name: Obtain Pull Request Branch
+      run: echo "PR_BRANCH=$( gh pr list | grep test-q${{ matrix.release }} | grep OPEN | awk -F'\t' '{print $3}' )" >> $GITHUB_ENV
     - name: Upload checksum artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -154,7 +157,6 @@ jobs:
     - name: Clean up - delete pull request and branch
       working-directory: working-copy
       run: |
-        PR_BRANCH=$( gh pr list | grep "test-q${{ matrix.release }}" | grep OPEN | awk -F'\t' '{print $3}' )
         if [[ ! -z "$PR_BRANCH" ]]; then
           git switch "test-q${{ matrix.release }}" # Switch before deletion
           gh pr close "$PR_BRANCH" --delete-branch
@@ -172,7 +174,6 @@ jobs:
 
 
   # Verify that the POM information is been collected as expected
-  # This test run also checks what happens when no migration checklist is used
 
   verify_pom_information:
     needs: [prepare_test_branches,branch_clean_up]

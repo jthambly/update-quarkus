@@ -92,6 +92,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         checklist: |
+          |
           Migration Checklist:
          
           - [x] Reviewers and Assignees assigned
