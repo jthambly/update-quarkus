@@ -271,7 +271,7 @@ runs:
     shell: bash
     working-directory: working-copy
     run: |
-      if [[ ! "$UPGRADE" || -z ${{ inputs.checklist }} ]]; then exit 0; fi # Skip - not upgrading, or no checklist
+      if [[ ! "$UPGRADE" || -z "${{ inputs.checklist }}" ]]; then exit 0; fi # Skip - not upgrading, or no checklist
 
       echo 'Action -> Add migration checklist'
 
