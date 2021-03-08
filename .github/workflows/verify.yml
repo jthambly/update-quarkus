@@ -136,7 +136,6 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         diagnostics: true
         checklist: |
-          |
           Migration Checklist:
          
           - [x] Reviewers and Assignees assigned
@@ -157,7 +156,7 @@ jobs:
           if [[ "${#comments_array[@]}" > 0 ]]; then # Comments exist
             echo -n ${comments_array[1]}
             echo -n ${comments_array[1]} | sha256sum | cut -c-64
-            [[ "$(echo -n ${comments_array[1]} | sha256sum | cut -c-64)" == 'ec301b4d4e9bd0d8674d911c35d63521e5460f9a979a0eb916ae0640ece30298' ]]
+            [[ "$(echo -n ${comments_array[1]} | sha256sum | cut -c-64)" == '1346d4a48d511b73dc09454e460fed0babcb79e0d93727eca13f942a132dcae2' ]]
           fi
         fi
     - name: Upload checksum artifacts

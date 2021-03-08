@@ -55,7 +55,7 @@ The GitHub token will need to be passed onto this action, for it to be able to o
 
 #### `checklist`
 
-An optional checklist can be published along with the final pull request. By default, it is not configured.
+An optional [checklist](https://docs.github.com/en/github/managing-your-work-on-github/about-task-lists) can be published along with the final pull request. By default, none will be added.
 
 #### `diagnostics`
 
@@ -92,7 +92,6 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         checklist: |
-          |
           Migration Checklist:
          
           - [x] Reviewers and Assignees assigned
