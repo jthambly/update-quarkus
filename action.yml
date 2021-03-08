@@ -21,6 +21,9 @@ inputs:
   github_token:
     description: 'Pass GitHub token to allow Action to perform tasks'
     required: true
+  checklist:
+    description: 'A migration checklist to place onto the Pull Request'
+    required: false
   diagnostics:
     description: '(Optional) Print additional information at the end.'
     required: false
@@ -266,24 +269,13 @@ runs:
 
   - name: Add migration checklist
     shell: bash
-    env:
-      GIT_CHKLIST: |
-        Migration Checklist:
-         
-        - [x] Reviewers and Assignees assigned
-        - [x] Link to Migration Documentation provided
-        - [ ] Migration Documentation reviewed
-        - [ ] Changes reviewed against existing project
-        - [ ] File modifications reviewed
-        - [ ] Automated checks performed
-        - [ ] Manual QA performed
     working-directory: working-copy
     run: |
-      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
+      if [[ ! "$UPGRADE" || -z ${{ inputs.checklist }} ]]; then exit 0; fi # Skip - not upgrading, or no checklist
 
       echo 'Action -> Add migration checklist'
 
-      gh pr comment --body "$GIT_CHKLIST"
+      gh pr comment --body "${{ inputs.checklist }}"
 
   - name: Diagnostics - Git working status
     shell: bash

@@ -135,6 +135,16 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         diagnostics: true
+        checklist: |
+          Migration Checklist:
+         
+          - [x] Reviewers and Assignees assigned
+          - [x] Link to Migration Documentation provided
+          - [ ] Migration Documentation reviewed
+          - [ ] Changes reviewed against existing project
+          - [ ] File modifications reviewed
+          - [ ] Automated checks performed
+          - [ ] Manual QA performed
     - name: Upload checksum artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -162,6 +172,7 @@ jobs:
 
 
   # Verify that the POM information is been collected as expected
+  # This test run also checks what happens when no migration checklist is used
 
   verify_pom_information:
     needs: [prepare_test_branches,branch_clean_up]

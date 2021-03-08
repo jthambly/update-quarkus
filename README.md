@@ -53,6 +53,10 @@ Development work is underway to create this as a custom GitHub Action to make th
 
 The GitHub token will need to be passed onto this action, for it to be able to operate with your repository.
 
+#### `checklist`
+
+An optional checklist can be published along with the final pull request. By default not configured.
+
 #### `diagnostics`
 
 If you wish to print out additional information such as the working tree, or environment variables, set it to `true`. Default `false`.
@@ -84,8 +88,18 @@ jobs:
         path: working-copy
 
     - name: Update Quarkus version
-      uses: jthambly/update-quarkus@v1.0.9
+      uses: jthambly/update-quarkus@v1.0.10
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        checklist: |
+          Migration Checklist:
+         
+          - [x] Reviewers and Assignees assigned
+          - [x] Link to Migration Documentation provided
+          - [ ] Migration Documentation reviewed
+          - [ ] Changes reviewed against existing project
+          - [ ] File modifications reviewed
+          - [ ] Automated checks performed
+          - [ ] Manual QA performed
 
 ```
