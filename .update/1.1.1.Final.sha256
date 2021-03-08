@@ -1,0 +1,8 @@
+510a53ae483c0d00d5a35101313cd7bf3ac8dd0d76422799762972181ec38e49  ./src/main/docker/Dockerfile.jvm
+55a537d981ebac50c98b7f2382347782fa1a4f970f35f2a909754536b572e553  ./src/main/resources/META-INF/resources/index.html
+7c3cee7d40bfeefc4a48e9dfea548b57041cfef52ac730ce80188c9af7ad1ee4  ./src/main/resources/application.properties
+94523c49a639032bd8081e03aa9ef4d283855f2e0e437b46db62b9dd93bae050  ./.gitignore
+98879887d3377028b52993c8f4c4e1dbc52f0896b032095fc3f2d044d06991c1  ./src/main/docker/Dockerfile.native
+c12ed1905c6904a00854e0a2087bb855dabda39fad6980e48b7507627b3c35af  ./pom.xml
+db34f68fad8d0bfe1c98e2b667c489e6b68d43d034722521ccad5776a3a8aa5b  ./README.md
+f2055a08da123997dd0402c415bf884f4f90dc7589efd5a0f28ba8e020058302  ./.dockerignore

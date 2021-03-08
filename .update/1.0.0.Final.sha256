@@ -1,0 +1,7 @@
+3dc1377ef1c77b12433168b2beebc37de90f882a16938a5538222f2750c2d545  ./src/main/resources/META-INF/resources/index.html
+7c3cee7d40bfeefc4a48e9dfea548b57041cfef52ac730ce80188c9af7ad1ee4  ./src/main/resources/application.properties
+94523c49a639032bd8081e03aa9ef4d283855f2e0e437b46db62b9dd93bae050  ./.gitignore
+98879887d3377028b52993c8f4c4e1dbc52f0896b032095fc3f2d044d06991c1  ./src/main/docker/Dockerfile.native
+d54d85329b4f71d78b7b778f69fe623d7dba83ff73a701a240f7c7df7a5f9922  ./src/main/docker/Dockerfile.jvm
+e6470fa4225a5e0ae5e1a2e4571d25b3792cb6ce768d4c4037730fb157b9438b  ./pom.xml
+f2055a08da123997dd0402c415bf884f4f90dc7589efd5a0f28ba8e020058302  ./.dockerignore
