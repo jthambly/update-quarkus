@@ -148,6 +148,18 @@ jobs:
           - [ ] Manual QA performed
     - name: Obtain Pull Request Branch
       run: echo "PR_BRANCH=$( gh pr list | grep test-q${{ matrix.release }} | grep OPEN | awk -F'\t' '{print $3}' )" >> $GITHUB_ENV
+    - name: Verify checklist in Pull Request
+      working-directory: working-copy
+      run: |
+        if [[ ! -z "$PR_BRANCH" ]]; then
+          IFS='^'
+          comments_array=($(gh pr view -c "$PR_BRANCH" | grep -A 100 '\-\-' | sed 's/--/\^/'))
+          if [[ "${#comments_array[@]}" > 0 ]]; then # Comments exist
+            echo -n ${comments_array[1]}
+            echo -n ${comments_array[1]} | sha256sum | cut -c-64
+            [[ "$(echo -n ${comments_array[1]} | sha256sum | cut -c-64)" == 'ec301b4d4e9bd0d8674d911c35d63521e5460f9a979a0eb916ae0640ece30298' ]]
+          fi
+        fi
     - name: Upload checksum artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -174,6 +186,7 @@ jobs:
 
 
   # Verify that the POM information is been collected as expected
+  # Verify that no issues exist not having a checklist
 
   verify_pom_information:
     needs: [prepare_test_branches,branch_clean_up]
@@ -200,6 +213,14 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         diagnostics: true
+    - name: Verify no checklist in Pull Request
+      working-directory: working-copy
+      run: |
+        if [[ ! -z "$PR_BRANCH" ]]; then
+          IFS='^'
+          comments_array=($(gh pr view -c "$PR_BRANCH" | grep -A 100 '\-\-' | sed 's/--/\^/'))
+          [[ "${#comments_array[@]}" == 0 ]];
+        fi
     - name: verify expected values
       run: |
         [[ 
