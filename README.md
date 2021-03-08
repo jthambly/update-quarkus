@@ -1,14 +1,22 @@
 [![Verify GitHub Action](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml/badge.svg)](https://github.com/jthambly/update-quarkus/actions/workflows/verify.yml)
 
-# update-quarkus
+# update-quarkus (quarkus-update-action)
 
-This project provides the GitHub Action workflows to update project files to use a newer version of [Quarkus](https://quarkus.io/).
+This project is for a GitHub Action that helps simplify the updating of [Quarkus](https://quarkus.io/) project files contained in a given GitHub repository.
 
 ## How to use
 
-Copy the [action file](.github/workflows/update-quarkus.yaml) to your projects `.github/workflows/` folder.
+To use, copy the [example code](#example-usage) snippet into a new file under the projects `.github/workflows/` folder. 
 
-The action will run automatically once a week or can be [manually run](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow).
+For example, in a file named `.github/workflows/update-quarkus.yaml`.
+
+In the [provided example](#example-usage), the action will run automatically once a week and has the option to be [run manually](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow).
+
+It is important to note, that when [checking out](https://github.com/actions/checkout#usage) the repository, the path needs to be set to use `working-copy`.
+
+For more information on creating GitHub Actions, please visit the recommended [Documentation](https://docs.github.com/en/actions/creating-actions).
+
+## What it does
 
 Once commenced:
 
@@ -18,54 +26,50 @@ Once commenced:
    - update and commit the new project files, 
    - create a pull request for your review,
    - include links to Quarkus documentation, and
-   - include a migration checklist.
+   - include a migration checklist (if provided).
 
-## Customization
+### Updating files
 
-There are two areas within the action file you may want to review and if necessary, configure.
+It will attempt to determine which Quarkus files it should remove from the given project, before copying the newer files across. 
 
-[**PROJECT_FILES**](.github/workflows/update-quarkus.yaml#L142)
+It decides this by using the following process:
 
-To determine which files are associated with Quarkus (as opposed to your files), the update process will generate a blank project using your current Quarkus version. Using this information, it will know which unmodified files to delete.
+1) If you have had a previous update, the process will leave a file listing with a checksum. 
+   Upon a subsequent update, it will know which files to remove; and with the included checksums, it will not touch modified files.
 
-If for some reason, it cannot generate a blank project (perhaps if a version is blocked for security reasons etc..) it will resort to a secondary method.
-In this case, it will update files with newer ones and may remove any files **not protected/listed** underneath the [PROJECT_FILES](.github/workflows/update-quarkus.yaml#L142) section.
+2) If no previous update information is available, it will generate a blank project using the current version.
+   It will use this blank project information to determine which unmodified Quarkus files to remove.
 
-*It is intended that this need will be removed in a later release, and the update process will attempt a best-effort approach.*
+3) Failing this, in particular for [certain Quarkus versions](https://github.com/jthambly/update-quarkus/issues/54#issue-820449828), it will not have enough information to automatically detect relevant files.
+   In this case, it will remove file names based on known Quarkus files. It will not however know which files have been modified, and which have not.
 
-The following blank project versions are known not to generate correctly:
- - 1.10.0.Final
- - 1.11.0.Final
- - 1.11.1.Final
+*The non-Quarkus project files will be safe. However, given that some of these backup processes may not be 100% accurate, it is always important to review changed files during the pull request review.*
 
-[**GIT_MSG - Migration Checklist**](.github/workflows/update-quarkus.yaml#L196)
+### Adding a Checklist
 
-Upon the creation of a pull request, a checklist will be added as a comment. 
-A basic checklist has already been provided, but you may wish to update it for your requirements.
+Upon the creation of a pull request, you can include a checklist. An example has been included in the [example code](#example-usage) snippet and uses the standard GitHub [task list format](https://docs.github.com/en/github/managing-your-work-on-github/about-task-lists).
 
-## Under Development - GitHub Action
+## Action information
 
-Development work is underway to create this as a custom GitHub Action to make this simpler. If you wish to try this out please continue reading.
+## Inputs
 
-### Inputs
+### `github_token`
 
-#### `github_token`
+The GitHub token will need to be passed onto this action, for it to be able to operate with the given repository.
 
-The GitHub token will need to be passed onto this action, for it to be able to operate with your repository.
-
-#### `checklist`
+### `checklist`
 
 An optional [checklist](https://docs.github.com/en/github/managing-your-work-on-github/about-task-lists) can be published along with the final pull request. By default, none will be added.
 
-#### `diagnostics`
+### `diagnostics`
 
 If you wish to print out additional information such as the working tree, or environment variables, set it to `true`. Default `false`.
 
-### Outputs
+## Outputs
  
 *There are no outputs for this Action.*
 
-### Example usage
+## Example usage
 
 ```
 
@@ -88,7 +92,7 @@ jobs:
         path: working-copy
 
     - name: Update Quarkus version
-      uses: jthambly/update-quarkus@v1.0.10
+      uses: jthambly/update-quarkus@v1.0.11
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         checklist: |
