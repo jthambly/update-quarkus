@@ -5,12 +5,10 @@
 110455023712cd032256d982ffdf7a3e2e74015f7a0810bef09eb57390e36b31  ./pom.xml
 136c408aa806a1d5272c97c1851c4e6096326b65cee62185131ed24636b91bc9  ./src/main/resources/META-INF/resources/index.html
 17212155ffb218cc21cc91fdf298d85a4a2628af308b155d89cd56d5ce973a44  ./.mvn/wrapper/maven-wrapper.properties
-1d1326964013d185613045b81bd3cf37a094a38995dc8fc2406a3f6926d30701  ./src/main/resources/META-INF/resources/index.html
 1e578cf7b7dda645610392078260623cee3f4a4d866c7b63a2854e243a6de376  ./src/main/docker/Dockerfile.jvm
 1e6ab2197c4502f1e8d6551d45c2cd4f0d9f5007d5daccd341158c81962d543c  ./src/test/java/org/example/GreetingResourceTest.java
 22000719dd55ed1b39c64efbdd65667d2badd3827024e52fe8a254df91ac82f2  ./src/main/resources/META-INF/resources/index.html
 2744729bf853b76866b7c074b86ea7339dc170a2a067cbaa81da966e6a1bbd44  ./mvnw
-2e8183cebe0d90ba7de734bf8cf82cb834d4f7ebd9c06581b6ff075bd24a7484  ./README.md
 2fe3107ee8fda3d50112fd496f329dd21fd73fba14ee771b715cde41eaaa43e6  ./src/main/resources/META-INF/resources/index.html
 351e8d918b262e33183531953509d3e7eeabb9c97ef9e64309a5d92ee068ce16  ./src/main/resources/META-INF/resources/index.html
 37245e3c3d78ea57226e20c7d36278e60cef73575a96bff21fcab5cfe6309be8  ./mvnw
