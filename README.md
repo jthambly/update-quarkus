@@ -55,7 +55,7 @@ The GitHub token will need to be passed onto this action, for it to be able to o
 
 #### `checklist`
 
-An optional checklist can be published along with the final pull request. By default not configured.
+An optional checklist can be published along with the final pull request. By default, it is not configured.
 
 #### `diagnostics`
 
