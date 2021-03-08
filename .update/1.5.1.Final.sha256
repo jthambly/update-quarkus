@@ -1,0 +1,13 @@
+0f37e00f4a503f19cfb1b8100b1f251f241cd1981524761bb9454037cb97589d  ./.mvn/wrapper/maven-wrapper.jar
+17212155ffb218cc21cc91fdf298d85a4a2628af308b155d89cd56d5ce973a44  ./.mvn/wrapper/maven-wrapper.properties
+37245e3c3d78ea57226e20c7d36278e60cef73575a96bff21fcab5cfe6309be8  ./mvnw
+6a780367972104169c14ba8e993ddcc2fab4d4fa2b74d4f5db8afdbbf14b6949  ./.mvn/wrapper/MavenWrapperDownloader.java
+7c3cee7d40bfeefc4a48e9dfea548b57041cfef52ac730ce80188c9af7ad1ee4  ./src/main/resources/application.properties
+8ed48c4b085618e87b3e68e6539aaedab7f9735ec25058eff0e5673914d12e4d  ./.gitignore
+8f0e8a55d64a525c5430f4504254b12d86d9449c8eca7af949648524a8dba63d  ./src/main/resources/META-INF/resources/index.html
+9fa7bdc15ac293283221756b6df011dea04f8572ab3523351e09e1bbcf628810  ./mvnw.cmd
+a1bfe27da705c499cd8cb0ca76d2d0a7af0abe80577c5396785c8062b2204c10  ./README.md
+b0b5e1b2ee41cbe3700bba1c67c86a339e4adc09c46f79541ca7676546f42ee1  ./src/main/docker/Dockerfile.native
+de06ffe30985d3f7af299aa11e236ae5d22a75fb160dabe6855a5b4d80671d2e  ./src/main/docker/Dockerfile.jvm
+e9671d0f8529c7fb0d00ef1f4fe2cd761991f8ce4ae801743724c3e46a0b35d8  ./pom.xml
+f2055a08da123997dd0402c415bf884f4f90dc7589efd5a0f28ba8e020058302  ./.dockerignore
