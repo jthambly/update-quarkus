@@ -41,7 +41,8 @@ It decides this by using the following process:
    It will use this blank project information to determine which unmodified Quarkus files to remove.
 
 3) Failing this, in particular for [certain Quarkus versions](https://github.com/jthambly/update-quarkus/issues/54#issue-820449828), it will not have enough information to automatically detect relevant files.
-   In this case, it will remove file names based on known Quarkus files. It will not however know which files have been modified, and which have not.
+   In this case, it will remove file names based on known Quarkus files. It will not however know which files have been modified, and which have not. 
+   The `application.settings`, `README.md`, and `index.html` files will not be removed during this process.
 
 *The non-Quarkus project files will be safe. However, given that some of these backup processes may not be 100% accurate, it is always important to review changed files during the pull request review.*
 
