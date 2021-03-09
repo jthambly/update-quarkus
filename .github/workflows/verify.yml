@@ -168,8 +168,10 @@ jobs:
           EXPECTED_CHKSUM=$(sha256sum ".update/$QUARKUS_VERSION.sha256" | cut -c-64)
           UPDATED_CHKSUM=$(find . -type f | xargs sha256sum | sort | grep -v './.git/\|./.update/' | sha256sum | cut -c-64)
           if [[ "$EXPECTED_CHKSUM" != "$UPDATED_CHKSUM" ]]; then
-            echo "Checksums do not match!"
-            sha256sum -c ".update/$QUARKUS_VERSION.sha256" | grep 'FAILED'
+            echo "::error::$(echo 'Post update checksums do not match'; sha256sum -c ".update/$QUARKUS_VERSION.sha256" | grep 'FAILED')"
+            echo "::group::Failed items"
+            echo "$(sha256sum -c .update/$QUARKUS_VERSION.sha256 | grep 'FAILED')"
+            echo "::endgroup::"
             exit 1
           fi
         fi
