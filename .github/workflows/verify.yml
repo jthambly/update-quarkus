@@ -159,6 +159,20 @@ jobs:
             [[ "$(echo -n ${comments_array[1]} | sha256sum | cut -c-64)" == '1346d4a48d511b73dc09454e460fed0babcb79e0d93727eca13f942a132dcae2' ]]
           fi
         fi
+    - name: Verify upgraded file system
+      if: ${{ env.QUARKUS_VERSION != env.CURRENT_VERSION && ! env.BRANCH_EXISTS }} 
+      continue-on-error: true
+      working-directory: working-copy
+      run: |
+        if [[ -f ".update/$QUARKUS_VERSION.sha256" ]]; then
+          EXPECTED_CHKSUM=$(sha256sum ".update/$QUARKUS_VERSION.sha256" | cut -c-64)
+          UPDATED_CHKSUM=$(find . -type f | xargs sha256sum | sort | grep -v './.git/\|./.update/' | sha256sum | cut -c-64)
+          if [[ "$EXPECTED_CHKSUM" != "$UPDATED_CHKSUM" ]]; then
+            echo "Checksums do not match!"
+            sha256sum -c ".update/$QUARKUS_VERSION.sha256" | grep 'FAILED'
+            exit 1
+          fi
+        fi
     - name: Upload checksum artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -284,5 +298,4 @@ jobs:
     - name: Push repository changes upstream
       if: ${{ env.CHECKSUM_UPDATE }}
       working-directory: working-copy
-      run: |
-        git push
+      run: git push
