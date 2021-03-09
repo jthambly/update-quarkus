@@ -14,10 +14,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+# Retained as a reference
+
 name: update-quarkus
 on:
-  schedule:
-    - cron: '0 0 * * 0'
+#  schedule:    
+#    - cron: '0 0 * * 0'
   workflow_dispatch:
   
 jobs:
