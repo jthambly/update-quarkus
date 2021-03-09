@@ -179,33 +179,47 @@ runs:
 
       rm -f pom.xml $(sha256sum -c ".update/$CURRENT_VERSION.sha256" 2> /dev/null | grep ': OK' | sed 's/: OK$//' | tr '\n' ' ')
       find . -type d -empty -delete
-         
-  - name: Update file structure using Copy
+
+  - name: Remove older Quarkus files based on known files
+    shell: bash
+    env:
+      QUARKUS_FILES: |
+        ./.dockerignore
+        ./.gitignore
+        ./.mvn/wrapper/MavenWrapperDownloader.java
+        ./.mvn/wrapper/maven-wrapper.jar
+        ./.mvn/wrapper/maven-wrapper.properties
+        ./README.md
+        ./mvnw
+        ./mvnw.cmd
+        ./pom.xml
+        ./src/main/docker/Dockerfile.fast-jar
+        ./src/main/docker/Dockerfile.jvm
+        ./src/main/docker/Dockerfile.legacy-jar
+        ./src/main/docker/Dockerfile.native
+        ./src/main/docker/Dockerfile.native-distroless
+        ./src/main/java/org/example/GreetingResource.java
+        ./src/main/resources/META-INF/resources/index.html
+        ./src/main/resources/application.properties
+        ./src/test/java/org/example/GreetingResourceTest.java
+        ./src/test/java/org/example/NativeGreetingResourceIT.java
+    working-directory: working-copy
+    run: |
+      if [[ ! "$UPGRADE" || "$CHK_SUM_EXISTS" ]]; then exit 0; fi # Skip - not upgrading, or checksum exists
+
+      echo 'Action -> Remove older Quarkus files based on known files'
+
+      rm -f $(echo "$QUARKUS_FILES" | grep -v 'README.md\|application.properties\|index.html' | tr '\n' ' ')
+      find . -type d -empty -delete
+
+  - name: Update file structure using new files
     shell: bash
     run: |
-      if [[ ! "$UPGRADE" || ! "$CHK_SUM_EXISTS" ]]; then exit 0; fi # Skip - not upgrading, or checksum does not exist
+      if [[ ! "$UPGRADE" ]]; then exit 0; fi # Skip - not upgrading
 
       echo 'Action -> Update file structure using Copy'
 
       cp -anv "new/$PROJECT_NAME/." "working-copy/"
-
-  - name: Update file structure using Rsync
-    shell: bash
-    env:
-      PROJECT_FILES: |
-        .git/
-        .github/
-        src/main/java/
-        src/main/resources/
-        src/test/
-        LICENCE
-        README
-    run: |
-      if [[ ! "$UPGRADE" || "$CHK_SUM_EXISTS" ]]; then exit 0; fi # Skip - not upgrading, or checksum exists
-
-      echo 'Action -> Update file structure using Rsync'
-
-      echo "$PROJECT_FILES" | rsync -av --delete --exclude-from=- "new/$PROJECT_NAME/" "working-copy/"
 
   - name: Set git author information
     shell: bash
