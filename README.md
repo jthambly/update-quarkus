@@ -10,7 +10,7 @@ To use, copy the [example code](#example-usage) snippet into a new file under th
 
 For example, in a file named `.github/workflows/update-quarkus.yaml`.
 
-In the [provided example](#example-usage), the action will run automatically once a week and has the option to be [run manually](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow).
+In the [provided example](#example-usage), the action will [run automatically](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#schedule) once a week and has the option to be [run manually](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow).
 
 It is important to note, that when [checking out](https://github.com/actions/checkout#usage) the repository, the path needs to be set to use `working-copy`.
 
@@ -48,6 +48,12 @@ It decides this by using the following process:
 ### Adding a Checklist
 
 Upon the creation of a pull request, you can include a checklist. An example has been included in the [example code](#example-usage) snippet and uses the standard GitHub [task list format](https://docs.github.com/en/github/managing-your-work-on-github/about-task-lists).
+
+### Continuous Integration
+
+This project will not conduct any Continuous Integration (CI) testing on your behalf for the updated files. 
+Depending on how the project was created, there may have been a basic CI test included from the Quarkus bootstrapper. 
+If not already in place, it would worthwhile [to implement](https://docs.github.com/en/actions/creating-actions), along with [branch protection](https://docs.github.com/en/github/administering-a-repository/about-protected-branches) features available through GitHub.
 
 ## Action information
 
