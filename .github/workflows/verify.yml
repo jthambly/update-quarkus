@@ -20,6 +20,8 @@ on:
     branches:
     - master
   workflow_dispatch:
+  schedule:
+  - cron: 0 23 * * *
 jobs:
 
 
@@ -160,7 +162,7 @@ jobs:
           fi
         fi
     - name: Verify upgraded file system
-      if: ${{ env.QUARKUS_VERSION != env.CURRENT_VERSION && ! env.BRANCH_EXISTS }} 
+      if: ${{ "$QUARKUS_VERSION" != "$CURRENT_VERSION" && ! "$BRANCH_EXISTS" }} 
       continue-on-error: true
       working-directory: working-copy
       run: |
