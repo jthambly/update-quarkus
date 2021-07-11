@@ -162,7 +162,7 @@ jobs:
           fi
         fi
     - name: Verify upgraded file system
-      if: ${{ "$QUARKUS_VERSION" != "$CURRENT_VERSION" && ! "$BRANCH_EXISTS" }} 
+      if: ${{ env.QUARKUS_VERSION != env.CURRENT_VERSION && ! env.BRANCH_EXISTS }} 
       continue-on-error: true
       working-directory: working-copy
       run: |
