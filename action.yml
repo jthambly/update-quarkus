@@ -125,8 +125,19 @@ runs:
       cd old
       mvn --quiet "io.quarkus:quarkus-maven-plugin:$CURRENT_VERSION:create" \
         -DprojectGroupId="$PROJECT_GROUP" \
-        -DprojectArtifactId="$PROJECT_NAME" \
-        -Dextensions="$QUARKUS_EXT"
+        -DprojectArtifactId="$PROJECT_NAME"
+
+      echo 'Action -> Determine which extensions to add'
+
+      cd "$PROJECT_NAME"
+      readarray -t needed_ext <<< $(echo "$QUARKUS_EXT" | tr ',' '\n')
+      readarray -t blank_project_ext <<< $(cat pom.xml | grep -A 3 '^\s*<dependency>' | grep 'groupId\|artifactId' | sed 's/<\/.*$//' | sed 's/^.*>//' | grep -v '\$' | sed 'N;s/\n/:/' | sort | uniq)
+
+      for ext in "${blank_project_ext[@]}"; do
+        needed_ext=("${needed_ext[@]/$ext}")
+      done
+
+      mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${needed_ext[@]} | tr '\n' ',' | sed 's/,$//')"
 
       exit 0 # continue-on-error
           
@@ -155,8 +166,19 @@ runs:
       cd new
       mvn --quiet "io.quarkus:quarkus-maven-plugin:$QUARKUS_VERSION:create" \
         -DprojectGroupId="$PROJECT_GROUP" \
-        -DprojectArtifactId="$PROJECT_NAME" \
-        -Dextensions="$QUARKUS_EXT"
+        -DprojectArtifactId="$PROJECT_NAME"
+
+      echo 'Action -> Determine which extensions to add'
+
+      cd "$PROJECT_NAME"
+      readarray -t needed_ext <<< $(echo "$QUARKUS_EXT" | tr ',' '\n')
+      readarray -t blank_project_ext <<< $(cat pom.xml | grep -A 3 '^\s*<dependency>' | grep 'groupId\|artifactId' | sed 's/<\/.*$//' | sed 's/^.*>//' | grep -v '\$' | sed 'N;s/\n/:/' | sort | uniq)
+
+      for ext in "${blank_project_ext[@]}"; do
+        needed_ext=("${needed_ext[@]/$ext}")
+      done
+
+      mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${needed_ext[@]} | tr '\n' ',' | sed 's/,$//')"
           
   - name: Generate checksums of latest base build
     shell: bash
