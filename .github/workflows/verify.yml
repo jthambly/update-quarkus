@@ -258,7 +258,7 @@ jobs:
           "$CURRENT_VERSION" == "${{ matrix.release }}" && 
           "$PROJECT_GROUP" == "org.example" &&
           "$PROJECT_NAME" == "test-project" &&
-          $(echo -n "$QUARKUS_EXT" | sha256sum | cut -c-64) == "58e6630e93eeb62d31e89c86c11c5e63f5394e037603b615979d2849b07b088b"
+          $(echo -n "$QUARKUS_EXT" | sha256sum | cut -c-64) == "955b2d58affa062118e101b85a40263da43539a0e5cd700085d898958d4bbf01"
         ]]
     - name: Compile project and verify
       working-directory: working-copy
