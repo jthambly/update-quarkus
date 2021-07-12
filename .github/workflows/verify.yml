@@ -204,6 +204,7 @@ jobs:
 
   # Verify that the POM information is been collected as expected
   # Verify that no issues exist not having a checklist
+  # Verify a complex extension list
 
   verify_pom_information:
     needs: [prepare_test_branches,branch_clean_up]
@@ -224,7 +225,16 @@ jobs:
     - name: Modify Quarkus extenstions
       working-directory: working-copy
       run: |
-        mvn --quiet quarkus:add-extension -Dextensions="io.quarkus:quarkus-flyway,io.quarkus:quarkus-infinispan-client"
+        mvn --quiet quarkus:add-extension -Dextensions="\
+            io.quarkus:quarkus-flyway,\
+            io.quarkus:quarkus-cache,\
+            io.quarkus:quarkus-infinispan-client,\
+            io.quarkus:quarkus-logging-json,\
+            io.quarkus:quarkus-oidc,\
+            io.quarkus:quarkus-resteasy-jsonb,\
+            io.quarkus:quarkus-resteasy-mutiny,\
+            io.quarkus:quarkus-resteasy-qute,\
+            io.quarkus:quarkus-smallrye-health"
     - name: TEST LOCAL ACTION
       uses: ./
       with:
@@ -244,7 +254,7 @@ jobs:
           "$CURRENT_VERSION" == "${{ matrix.release }}" && 
           "$PROJECT_GROUP" == "org.example" &&
           "$PROJECT_NAME" == "test-project" &&
-          $(echo -n "$QUARKUS_EXT" | sha256sum | cut -c-64) == "60829d08d153ecd87c3d8aeaed1de091d3d44874276bbc52fc620b5a9dd13398"
+          $(echo -n "$QUARKUS_EXT" | sha256sum | cut -c-64) == "58e6630e93eeb62d31e89c86c11c5e63f5394e037603b615979d2849b07b088b"
         ]]
     - name: Clean up - delete pull request and branch
       working-directory: working-copy
