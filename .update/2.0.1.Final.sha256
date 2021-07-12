@@ -8,8 +8,8 @@
 7f3d4e2406aca0f35a01cac7e9147ba57c8ff6a5e0d7ce09a3e1f5a28b346f70  ./src/main/docker/Dockerfile.jvm
 875ba7fa5071e735f13447ddd25ff9f7fa93b9a9e1426922fb10c9a0b35ece5b  ./.mvn/wrapper/MavenWrapperDownloader.java
 96d183abb0dd5d832c306af794598375cbc658aef9f8e9643a7680d51102e52b  ./src/main/docker/Dockerfile.native-distroless
-a846283d295f440b4d784de235e4f6b4c8edc6b5860a4567b470b53a4d5a80a3  ./pom.xml
 b5817070717211a9f690c5e2799fcd7317563f1aac8be2e94c5e5e653246da23  ./.gitignore
+c8ed356b373534e13716435ce19ed594f7282c13b0b172d36917b2d671dcfa06  ./pom.xml
 d58f5e1a2bf0ccc6a6d3e0bd24f95bd6b60ff1dfe4d10f26c752621d5c4b1956  ./mvnw.cmd
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./src/main/resources/application.properties
 e6ab51c6bc43b0e7d9f756238c9090471b42d6731fd8c6a3c36462cb837d0f7f  ./src/test/java/org/example/GreetingResourceTest.java
