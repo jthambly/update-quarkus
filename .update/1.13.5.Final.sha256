@@ -11,7 +11,7 @@
 8baee9cb9edbbc6fe57554388d56d00a291400ea18375b80a641b72ef613769f  ./src/main/docker/Dockerfile.jvm
 96d183abb0dd5d832c306af794598375cbc658aef9f8e9643a7680d51102e52b  ./src/main/docker/Dockerfile.native-distroless
 b5817070717211a9f690c5e2799fcd7317563f1aac8be2e94c5e5e653246da23  ./.gitignore
-cd06fa336286767a115929c65d208244e0f412edc4f94027b6f676383daf139f  ./pom.xml
 d58f5e1a2bf0ccc6a6d3e0bd24f95bd6b60ff1dfe4d10f26c752621d5c4b1956  ./mvnw.cmd
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./src/main/resources/application.properties
 f0cd622d1db62eb688cc424bed1edfa2cee57dd5eff24aeb656618684be42069  ./src/test/java/org/example/NativeGreetingResourceIT.java
+fb5b8dffae0fc987e4845262b46c9205eba342cce8e80883e8ae77c840d1f2ef  ./pom.xml
