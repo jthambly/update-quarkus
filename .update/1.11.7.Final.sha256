@@ -1,4 +1,3 @@
-0cc68dc744af97e041165a4622ae139a68227772588f751f69cd823a91e1b54e  ./pom.xml
 17212155ffb218cc21cc91fdf298d85a4a2628af308b155d89cd56d5ce973a44  ./.mvn/wrapper/maven-wrapper.properties
 1e6ab2197c4502f1e8d6551d45c2cd4f0d9f5007d5daccd341158c81962d543c  ./src/test/java/org/example/GreetingResourceTest.java
 2744729bf853b76866b7c074b86ea7339dc170a2a067cbaa81da966e6a1bbd44  ./mvnw
@@ -6,6 +5,7 @@
 3ee7894b31d9673b4dc275bd79e7f2378a7af53cec2de7f84de0341921da793e  ./src/main/docker/Dockerfile.native
 420d1331e8b51a2699d16c61801e38972374fd6a20a1b3efb084fbd9ec511a80  ./README.md
 55266166432dfb6808237f2e69eafc8b2df6aa8f57399766870b0118a6f73eef  ./src/main/java/org/example/GreetingResource.java
+5fcf92116545bf1228191add82a37b086ed1a0324b14f77a6ada78a256f9a973  ./pom.xml
 875ba7fa5071e735f13447ddd25ff9f7fa93b9a9e1426922fb10c9a0b35ece5b  ./.mvn/wrapper/MavenWrapperDownloader.java
 b5817070717211a9f690c5e2799fcd7317563f1aac8be2e94c5e5e653246da23  ./.gitignore
 baf91f46ce24bc77cd9a2653f8ab0b20afb9dbb597e69ceeab44e8929d1b7af8  ./src/main/resources/META-INF/resources/index.html
