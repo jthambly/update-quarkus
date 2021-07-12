@@ -1,4 +1,4 @@
-08a9172e8b856dfc76e94f86cbbea60f3887c90d0ca679f1d437bfedac06aff3  ./pom.xml
+01734b27f49916b9500e0d9278f27938529011558ded4bb9d44e342c62279b50  ./pom.xml
 1e6ab2197c4502f1e8d6551d45c2cd4f0d9f5007d5daccd341158c81962d543c  ./src/test/java/org/example/GreetingResourceTest.java
 2744729bf853b76866b7c074b86ea7339dc170a2a067cbaa81da966e6a1bbd44  ./mvnw
 315db25c483be7415e3c54af940f82e5ec7f1dba863799f780f162f6b5944fcb  ./src/main/docker/Dockerfile.legacy-jar

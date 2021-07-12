@@ -1,7 +1,7 @@
 17212155ffb218cc21cc91fdf298d85a4a2628af308b155d89cd56d5ce973a44  ./.mvn/wrapper/maven-wrapper.properties
+1a16a9e4a99098a0ce651f36fd7c682f87545f975d580506be8c439d5fa7a0d1  ./pom.xml
 1e6ab2197c4502f1e8d6551d45c2cd4f0d9f5007d5daccd341158c81962d543c  ./src/test/java/org/example/GreetingResourceTest.java
 2744729bf853b76866b7c074b86ea7339dc170a2a067cbaa81da966e6a1bbd44  ./mvnw
-301cba2cc7402fa38f993a27adedb3de8576e372c673f56b00d114fb0363d293  ./pom.xml
 315db25c483be7415e3c54af940f82e5ec7f1dba863799f780f162f6b5944fcb  ./src/main/docker/Dockerfile.legacy-jar
 379e0d5e4075f1f7fed55b70d94a84ddfbfc09042e01368da11dc29938baf456  ./src/main/resources/META-INF/resources/index.html
 39b0bd3b7287783b4c4a24b533ea13483f7b7c7f59d2b5d9eb7c3f0ca1786d35  ./.dockerignore

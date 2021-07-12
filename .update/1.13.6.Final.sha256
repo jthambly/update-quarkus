@@ -4,7 +4,6 @@
 315db25c483be7415e3c54af940f82e5ec7f1dba863799f780f162f6b5944fcb  ./src/main/docker/Dockerfile.legacy-jar
 39b0bd3b7287783b4c4a24b533ea13483f7b7c7f59d2b5d9eb7c3f0ca1786d35  ./.dockerignore
 3ee7894b31d9673b4dc275bd79e7f2378a7af53cec2de7f84de0341921da793e  ./src/main/docker/Dockerfile.native
-4c5f20b5d4114d29686e8d5dac31467b15f8a4f59c89010b9442e573fd600306  ./pom.xml
 5342f8df43b4b221856355aa3c2064fc28de44c93327048d2468a04b3c9d2d1d  ./README.md
 55266166432dfb6808237f2e69eafc8b2df6aa8f57399766870b0118a6f73eef  ./src/main/java/org/example/GreetingResource.java
 6fbe53e5bff2d9c67a96b4d598791f3b9223b3f2f3ab986d304bee03819db591  ./src/main/resources/META-INF/resources/index.html
@@ -14,4 +13,5 @@
 b5817070717211a9f690c5e2799fcd7317563f1aac8be2e94c5e5e653246da23  ./.gitignore
 d58f5e1a2bf0ccc6a6d3e0bd24f95bd6b60ff1dfe4d10f26c752621d5c4b1956  ./mvnw.cmd
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./src/main/resources/application.properties
+eb34b6019c9c365e63093a63e418bf3ea6a87182c7a87ce3daf4a57d9415b4f3  ./pom.xml
 f0cd622d1db62eb688cc424bed1edfa2cee57dd5eff24aeb656618684be42069  ./src/test/java/org/example/NativeGreetingResourceIT.java

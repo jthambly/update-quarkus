@@ -1,4 +1,5 @@
 0e98d0c7b2333bed4ba8c8bb3e4b29a9e2a68c8b1e84acf83caeca8ba5316670  ./src/main/docker/Dockerfile.native
+1fcebfe2f1c1c98acc532683174020bf2b50cf12184ba92f2315b1661de72ceb  ./pom.xml
 2744729bf853b76866b7c074b86ea7339dc170a2a067cbaa81da966e6a1bbd44  ./mvnw
 2f331ad1581572b620cd3a28410350b53c2920c56ee0a7d20d0db4591e315c9d  ./src/main/resources/META-INF/resources/index.html
 315bb28578d9d20b560c9a32196b0f3aac75b32dfbd578792596a7f0ae092353  ./README.md
@@ -9,7 +10,6 @@
 875ba7fa5071e735f13447ddd25ff9f7fa93b9a9e1426922fb10c9a0b35ece5b  ./.mvn/wrapper/MavenWrapperDownloader.java
 96d183abb0dd5d832c306af794598375cbc658aef9f8e9643a7680d51102e52b  ./src/main/docker/Dockerfile.native-distroless
 b5817070717211a9f690c5e2799fcd7317563f1aac8be2e94c5e5e653246da23  ./.gitignore
-c88429052ddaf8ef4a1b44f12d41775f665efb1b63ac2b02fed315e20ce8c983  ./pom.xml
 d58f5e1a2bf0ccc6a6d3e0bd24f95bd6b60ff1dfe4d10f26c752621d5c4b1956  ./mvnw.cmd
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./src/main/resources/application.properties
 e6ab51c6bc43b0e7d9f756238c9090471b42d6731fd8c6a3c36462cb837d0f7f  ./src/test/java/org/example/GreetingResourceTest.java
