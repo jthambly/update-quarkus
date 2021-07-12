@@ -180,7 +180,7 @@ jobs:
         fi
     - name: Compile project and verify
       working-directory: working-copy
-      run: mvn verify -B
+      run: mvn --quiet verify -B
     - name: Upload checksum artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -235,7 +235,6 @@ jobs:
             io.quarkus:quarkus-cache,\
             io.quarkus:quarkus-infinispan-client,\
             io.quarkus:quarkus-logging-json,\
-            io.quarkus:quarkus-oidc,\
             io.quarkus:quarkus-resteasy-jsonb,\
             io.quarkus:quarkus-resteasy-mutiny,\
             io.quarkus:quarkus-resteasy-qute,\
@@ -263,7 +262,7 @@ jobs:
         ]]
     - name: Compile project and verify
       working-directory: working-copy
-      run: mvn verify -B
+      run: mvn --quiet verify -B
     - name: Clean up - delete pull request and branch
       working-directory: working-copy
       run: |
