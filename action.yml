@@ -135,11 +135,15 @@ runs:
 
       add_ext=()
       for ext in "${needed_ext[@]}"; do
+        add_check=1
         for ext2 in "${blank_project_ext[@]}"; do
           if [[ "$ext" == "$ext2" ]]; then
-            add_ext+=("$ext");
+            add_check=0
           fi
         done
+        if [[ "$add_check" == 1 ]]; then
+          add_ext+=("$ext");
+        fi
       done
 
       mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${add_ext[@]} | tr "$IFS" ',' | sed 's/,$//')"
@@ -181,11 +185,15 @@ runs:
 
       add_ext=()
       for ext in "${needed_ext[@]}"; do
+        add_check=1
         for ext2 in "${blank_project_ext[@]}"; do
           if [[ "$ext" == "$ext2" ]]; then
-            add_ext+=("$ext");
+            add_check=0
           fi
         done
+        if [[ "$add_check" == 1 ]]; then
+          add_ext+=("$ext");
+        fi
       done
 
       mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${add_ext[@]} | tr "$IFS" ',' | sed 's/,$//')"
