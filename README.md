@@ -99,7 +99,7 @@ jobs:
         path: working-copy
 
     - name: Update Quarkus version
-      uses: jthambly/update-quarkus@v1.0.12
+      uses: jthambly/update-quarkus@v1.0.13
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         checklist: |
@@ -112,5 +112,25 @@ jobs:
           - [ ] File modifications reviewed
           - [ ] Automated checks performed
           - [ ] Manual QA performed
+
+```
+
+## Keeping GitHub Actions up-to-date with Dependabot.
+
+If you wish to keep this Action up-to-date within your project (along with any other Actions), you can use [dependabot](https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/keeping-your-actions-up-to-date-with-dependabot).
+Simply create a `dependabot.yml` file under your `.github` folder with the following contents:
+
+```
+
+# Set update schedule for GitHub Actions
+
+version: 2
+updates:
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      # Check for updates to GitHub Actions every weekday
+      interval: "daily"
 
 ```
