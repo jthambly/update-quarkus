@@ -133,11 +133,16 @@ runs:
       readarray -t needed_ext <<< $(echo "$QUARKUS_EXT" | tr ',' '\n')
       readarray -t blank_project_ext <<< $(cat pom.xml | grep -A 3 '^\s*<dependency>' | grep 'groupId\|artifactId' | sed 's/<\/.*$//' | sed 's/^.*>//' | grep -v '\$' | sed 'N;s/\n/:/' | sort | uniq)
 
-      for ext in "${blank_project_ext[@]}"; do
-        needed_ext=("${needed_ext[@]/$ext}")
+      add_ext=()
+      for ext in "${needed_ext[@]}"; do
+        for ext2 in "${blank_project_ext[@]}"; do
+          if [[ "$ext" == "$ext2" ]]; then
+            add_ext+=("$ext");
+          fi
+        done
       done
 
-      mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${needed_ext[@]} | tr '\n' ',' | sed 's/,$//')"
+      mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${add_ext[@]} | tr '\n' ',' | sed 's/,$//')"
 
       exit 0 # continue-on-error
           
@@ -174,11 +179,16 @@ runs:
       readarray -t needed_ext <<< $(echo "$QUARKUS_EXT" | tr ',' '\n')
       readarray -t blank_project_ext <<< $(cat pom.xml | grep -A 3 '^\s*<dependency>' | grep 'groupId\|artifactId' | sed 's/<\/.*$//' | sed 's/^.*>//' | grep -v '\$' | sed 'N;s/\n/:/' | sort | uniq)
 
-      for ext in "${blank_project_ext[@]}"; do
-        needed_ext=("${needed_ext[@]/$ext}")
+      add_ext=()
+      for ext in "${needed_ext[@]}"; do
+        for ext2 in "${blank_project_ext[@]}"; do
+          if [[ "$ext" == "$ext2" ]]; then
+            add_ext+=("$ext");
+          fi
+        done
       done
 
-      mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${needed_ext[@]} | tr '\n' ',' | sed 's/,$//')"
+      mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${add_ext[@]} | tr '\n' ',' | sed 's/,$//')"
           
   - name: Generate checksums of latest base build
     shell: bash
