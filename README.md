@@ -115,10 +115,10 @@ jobs:
 
 ```
 
-## Keeping GitHub Actions up-to-date with Dependabot.
+## Keep GitHub Actions up-to-date with Dependabot.
 
-If you wish to keep this Action up-to-date within your project (along with any other Actions), you can use [dependabot](https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/keeping-your-actions-up-to-date-with-dependabot).
-Simply create a `dependabot.yml` file under your `.github` folder with the following contents:
+If you wish to keep this Action up-to-date within your project (along with any other Actions), you can use [Dependabot](https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/keeping-your-actions-up-to-date-with-dependabot).
+Simply create a `dependabot.yml` file directly under your `.github` folder with the following contents:
 
 ```
 
