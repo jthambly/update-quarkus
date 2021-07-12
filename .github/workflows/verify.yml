@@ -114,6 +114,7 @@ jobs:
 
 
   # Run update tests on a select number of test versions
+  # Compile and verify project
 
   verify_update_action:
     needs: [determine_test_cases,branch_clean_up]
@@ -177,6 +178,9 @@ jobs:
             exit 1
           fi
         fi
+    - name: Compile project and verify
+      working-directory: working-copy
+      run: mvn verify -B
     - name: Upload checksum artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -205,6 +209,7 @@ jobs:
   # Verify that the POM information is been collected as expected
   # Verify that no issues exist not having a checklist
   # Verify a complex extension list
+  # Compile and verify project
 
   verify_pom_information:
     needs: [prepare_test_branches,branch_clean_up]
@@ -256,6 +261,9 @@ jobs:
           "$PROJECT_NAME" == "test-project" &&
           $(echo -n "$QUARKUS_EXT" | sha256sum | cut -c-64) == "58e6630e93eeb62d31e89c86c11c5e63f5394e037603b615979d2849b07b088b"
         ]]
+    - name: Compile project and verify
+      working-directory: working-copy
+      run: mvn verify -B
     - name: Clean up - delete pull request and branch
       working-directory: working-copy
       run: |
