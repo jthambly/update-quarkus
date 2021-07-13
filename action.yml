@@ -146,7 +146,9 @@ runs:
         fi
       done
 
-      mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${add_ext[@]} | tr "$IFS" ',' | sed 's/,$//')"
+      if [[ "${#add_ext[@]}" -gt 0 ]]; then
+        mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${add_ext[@]} | tr "$IFS" ',' | sed 's/,$//')"
+      fi
 
       exit 0 # continue-on-error
           
@@ -196,7 +198,9 @@ runs:
         fi
       done
 
-      mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${add_ext[@]} | tr "$IFS" ',' | sed 's/,$//')"
+      if [[ "${#add_ext[@]}" -gt 0 ]]; then
+        mvn --quiet  quarkus:add-extension -Dextensions="$(echo ${add_ext[@]} | tr "$IFS" ',' | sed 's/,$//')"
+      fi
           
   - name: Generate checksums of latest base build
     shell: bash
