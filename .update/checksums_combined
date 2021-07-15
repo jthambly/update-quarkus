@@ -98,6 +98,7 @@ baf91f46ce24bc77cd9a2653f8ab0b20afb9dbb597e69ceeab44e8929d1b7af8  ./src/main/res
 bb5467e3619c154411192ba843be5a32df3405143648214d8ea309527f1674f1  ./src/main/docker/Dockerfile.fast-jar
 bd200eef651ec2be246fe163d684f2d632a4bcf4ed9491b52433daee18fe6c6c  ./src/main/resources/META-INF/resources/index.html
 bfcd54b9c96b73216170e7be1244dffd792060b01022a8d126e87035fefbabc5  ./README.md
+bfece44b7d9608b9ac73925173022eb1e06bdd82678537665fcce543b540462a  ./src/main/resources/META-INF/resources/index.html
 c12ed1905c6904a00854e0a2087bb855dabda39fad6980e48b7507627b3c35af  ./pom.xml
 c3012bcccb2756426fdcd72c6d8cf38a3660665373789556052d905b3e69a9da  ./src/main/resources/META-INF/resources/index.html
 c3a65ac709342615e7460883e8b74f90186460469419711982f4df02f1d389da  ./pom.xml
@@ -116,6 +117,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./src/main/res
 e6470fa4225a5e0ae5e1a2e4571d25b3792cb6ce768d4c4037730fb157b9438b  ./pom.xml
 e6ab51c6bc43b0e7d9f756238c9090471b42d6731fd8c6a3c36462cb837d0f7f  ./src/test/java/org/example/GreetingResourceTest.java
 e70527d63a716715998c0a2617c9bfdf9f69aca633c3ebc35d1f7fc0b1ec4f59  ./src/main/resources/META-INF/resources/index.html
+e7887a5a77a9f160e28c5175ba81709b39856e3d3b58a5b282f3754a3279c599  ./pom.xml
 e9671d0f8529c7fb0d00ef1f4fe2cd761991f8ce4ae801743724c3e46a0b35d8  ./pom.xml
 eb34b6019c9c365e63093a63e418bf3ea6a87182c7a87ce3daf4a57d9415b4f3  ./pom.xml
 eb9590544f22614aa9caf3a83648f95bcafc2790898d858ba9843a6d324d0cc0  ./src/main/docker/Dockerfile.fast-jar
