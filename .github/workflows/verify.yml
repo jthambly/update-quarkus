@@ -288,7 +288,7 @@ jobs:
         git fetch --all --quiet
         git switch "${{ github.head_ref }}"
     - name: Download checksum artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with: 
         path: checksums
     - name: Ensure update directory exists
